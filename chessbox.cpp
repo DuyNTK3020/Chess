@@ -167,6 +167,12 @@ QString ChessBox::getChessPieceColor()
     return chessPieceColor;
 }
 
+QString ChessBox::getPosition()
+{
+    return QString::number(this->rowLoc) + "-" + QString::number(this->colLoc);
+}
+
+
 void ChessBox::setChessPieceColor(QString value)
 {
     chessPieceColor = value;
