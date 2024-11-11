@@ -5,7 +5,6 @@
 #-------------------------------------------------
 
 QT       += core gui
-QT       += network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -14,7 +13,6 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp \
-    clientmanager.cpp \
     game.cpp \
     chessbox.cpp \
     chessboard.cpp \
@@ -28,7 +26,6 @@ SOURCES += main.cpp \
     button.cpp
 
 HEADERS  += \
-    clientmanager.h \
     game.h \
     chessbox.h \
     chessboard.h \

@@ -33,10 +33,9 @@ void ChessPiece::mousePressEvent(QGraphicsSceneMouseEvent *event)
     //Consuming counterPart of the CHessBox
     else if(this->getSide() != game->pieceToMove->getSide()){
         this->getCurrentBox()->mousePressEvent(event);
-        QString moveData = game->pieceToMove->getCurrentBox()->getPosition();
-        qDebug() << moveData;
-        emit moveMade(moveData);
     }
+
+
 }
 
 void ChessPiece::setCurrentBox(ChessBox *box)

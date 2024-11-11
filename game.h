@@ -29,7 +29,6 @@ public:
     void setTurn( QString value);
     void changeTurn();
 
-    QList<ChessPiece *> getAllChessPieces();
 
 
     ChessBox *collection[8][8];

@@ -6,9 +6,8 @@
 #include <QGraphicsSceneMouseEvent>
 
 class ChessBox;
-class ChessPiece:public QObject, public QGraphicsPixmapItem
+class ChessPiece:public QGraphicsPixmapItem
 {
-    Q_OBJECT
 public:
     ChessPiece(QString team = "",QGraphicsItem *parent = 0);
 
@@ -31,8 +30,6 @@ public:
     bool firstMove;
 
     bool boxSetting(ChessBox *box);
-signals:
-    void moveMade(const QString &moveData);
 protected:
     ChessBox *currentBox;
     QString side;

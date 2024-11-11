@@ -5,7 +5,6 @@
 #include <QDebug>
 #include <QLineEdit>
 #include <QGraphicsProxyWidget>
-#include "clientmanager.h"
 Game::Game(QWidget *parent ):QGraphicsView(parent)
 {
 
@@ -172,12 +171,7 @@ void Game::drawDeadHolder(int x, int y,QColor color)
 }
 
 
-QList<ChessPiece*> Game::getAllChessPieces() {
-    return this->alivePiece; // Giả sử `allChessPieces` là danh sách chứa tất cả các quân cờ
-}
 
-
-extern ClientManager *clientManager;
 void Game::displayMainMenu()
 {
     // Clear previous items
@@ -233,11 +227,6 @@ void Game::displayMainMenu()
     connect(loginButton, &Button::clicked, this, [=]() {
         QString username = usernameInput->text();
         QString password = passwordInput->text();
-
-        if (clientManager) {
-            QString message = "Username: " + username + ", Password: " + password;
-            clientManager->sendMove(message);
-        }
 
         if (username == "user" && password == "password") {
             start();  // Start the game if credentials match
