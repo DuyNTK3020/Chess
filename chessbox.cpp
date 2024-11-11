@@ -42,7 +42,6 @@ void ChessBox::mousePressEvent(QGraphicsSceneMouseEvent *event)
             for(size_t i = 0, n = movLoc.size(); i < n;i++) {
                 if(movLoc[i] == this) {
                     check++;
-
                 }
             }
             // if not prsent return
@@ -166,6 +165,12 @@ QString ChessBox::getChessPieceColor()
 {
     return chessPieceColor;
 }
+
+QString ChessBox::getPosition()
+{
+    return QString::number(this->rowLoc) + "-" + QString::number(this->colLoc);
+}
+
 
 void ChessBox::setChessPieceColor(QString value)
 {
