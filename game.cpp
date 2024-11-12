@@ -348,6 +348,9 @@ void Game::displayRegister() {
         registerSuccess->setPlainText("Registration Successful!");
         registerSuccess->setPos(width()/2 - registerSuccess->boundingRect().width()/2, 450);
         errorText->setPlainText("");
+
+        // Gọi phương thức gửi yêu cầu đăng ký đến server
+        clientManager->sendRegisterRequest(username, password);
     });
     addToScene(registerSuccess);
 
