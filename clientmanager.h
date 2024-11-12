@@ -12,6 +12,8 @@ public:
     void connectToServer(const QString &host, int port);
     void sendMove(const QString &moveData);
 
+    void sendRegisterRequest(const QString &username, const QString &password);
+
 signals:
     void moveReceived(const QString &moveData);
 

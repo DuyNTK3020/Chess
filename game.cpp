@@ -346,8 +346,11 @@ void Game::displayRegister() {
 
         // Đăng ký thành công
         registerSuccess->setPlainText("Registration Successful!");
+        registerSuccess->setPos(width()/2 - registerSuccess->boundingRect().width()/2, 450);
         errorText->setPlainText("");
     });
+    addToScene(registerSuccess);
+
     addToScene(registerButton);
     listG.append(registerButton);
 
