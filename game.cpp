@@ -252,7 +252,7 @@ void Game::displayLogin() {
 
     // Nút đăng ký
     Button *registerButton = new Button("Register");
-    registerButton->setPos(btnXPos, btnYPos + 50);
+    registerButton->setPos(btnXPos, btnYPos + 100);
     connect(registerButton, &Button::clicked, this, &Game::displayRegister);
     addToScene(registerButton);
     listG.append(registerButton);
@@ -260,7 +260,6 @@ void Game::displayLogin() {
     drawChessBoard();
 }
 
-// Hàm hiển thị màn hình đăng ký
 void Game::displayRegister() {
     // Xóa các mục hiện tại
     for (auto item : listG) {
@@ -310,34 +309,59 @@ void Game::displayRegister() {
     proxyConfirmPassword->setPos(width()/2 - confirmPasswordInput->width()/2, 350);
     listG.append(proxyConfirmPassword);
 
+    QGraphicsTextItem *errorText = new QGraphicsTextItem("");
+    errorText->setDefaultTextColor(Qt::red);
+    errorText->setPos(width()/2 - registerTitle->boundingRect().width()/2 + 25, 450);
+    addToScene(errorText);
+    listG.append(errorText);
+
+    QGraphicsTextItem *registerSuccess = new QGraphicsTextItem("");
+    registerSuccess->setDefaultTextColor(Qt::green);
+    registerSuccess->setPos(width()/2 - registerTitle->boundingRect().width()/2 + 25, 450);
+    addToScene(registerSuccess);
+    listG.append(registerSuccess);
+
     // Nút đăng ký
     Button *registerButton = new Button("Register");
     registerButton->setPos(width()/2 - registerButton->boundingRect().width()/2, 400);
     connect(registerButton, &Button::clicked, this, [=]() {
+        QString name = nameInput->text();
         QString username = usernameInput->text();
         QString password = passwordInput->text();
         QString confirmPassword = confirmPasswordInput->text();
 
+        // Kiểm tra nếu có trường nào còn trống
+        if (name.isEmpty() || username.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
+            qDebug() << "All fields must be filled!";
+            errorText->setPlainText("All fields must be filled!");
+            return; // Dừng lại không thực hiện đăng ký
+        }
+
+        // Kiểm tra mật khẩu xác nhận
         if (password != confirmPassword) {
             qDebug() << "Passwords do not match!";
-            return;
+            errorText->setPlainText("Passwords do not match!");
+            return; // Dừng lại không thực hiện đăng ký
         }
 
         // Đăng ký thành công
-        QGraphicsTextItem *registerSuccess = new QGraphicsTextItem("Registration Successful!");
-        registerSuccess->setDefaultTextColor(Qt::green);
-        registerSuccess->setPos(width()/2 - registerSuccess->boundingRect().width()/2, 450);
-        addToScene(registerSuccess);
-
-        // Quay lại màn hình đăng nhập
-        Button *loginButton = new Button("Back to Login");
-        loginButton->setPos(width()/2 - loginButton->boundingRect().width()/2, 500);
-        connect(loginButton, &Button::clicked, this, &Game::displayLogin);
-        addToScene(loginButton);
-        listG.append(loginButton);
+        registerSuccess->setPlainText("Registration Successful!");
+        errorText->setPlainText("");
     });
     addToScene(registerButton);
     listG.append(registerButton);
+
+    // Quay lại màn hình đăng nhập
+    Button *loginButton = new Button("Back to Login");
+    loginButton->setPos(width()/2 - loginButton->boundingRect().width()/2, 500);
+    connect(loginButton, &Button::clicked, this, [=]() {
+        // Kiểm tra đăng ký và hiển thị thông báo nếu thành công
+        qDebug() << "Registration Successful!";
+        // Hiển thị thông báo và chuyển về màn hình login
+        displayLogin();  // Quay lại màn hình login sau khi đăng ký thành công
+    });
+    addToScene(loginButton);
+    listG.append(loginButton);
 }
 
 void Game::gameOver()
