@@ -25,7 +25,8 @@ SOURCES += main.cpp \
     knight.cpp \
     rook.cpp \
     king.cpp \
-    button.cpp
+    button.cpp \
+    user.cpp
 
 HEADERS  += \
     clientmanager.h \
@@ -39,7 +40,8 @@ HEADERS  += \
     knight.h \
     rook.h \
     king.h \
-    button.h
+    button.h \
+    user.h
 
 FORMS    +=
 

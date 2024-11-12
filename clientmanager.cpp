@@ -34,6 +34,8 @@ void ClientManager::onReadyRead()
     QString moveData = QString::fromUtf8(socket->readAll());
     emit moveReceived(moveData);
 
+    qDebug() << moveData;
+
     QJsonDocument doc = QJsonDocument::fromJson(moveData.toUtf8());
     if (doc.isObject()) {
         QJsonObject jsonObj = doc.object();
