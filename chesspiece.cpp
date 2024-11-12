@@ -18,24 +18,27 @@ void ChessPiece::mousePressEvent(QGraphicsSceneMouseEvent *event)
         game->pieceToMove->getCurrentBox()->resetOriginalColor();
         game->pieceToMove->decolor();
         game->pieceToMove = NULL;
-       return;
+        // qDebug() << game->pieceToMove->getCurrentBox()->getPosition();
+        return;
     }
     //if it is already consumed or not the respective color's turn
     if((!getIsPlaced() )|| ( (game->getTurn() != this->getSide())&& (!game->pieceToMove)) )
         return;
     //selecting
     if(!game->pieceToMove){
-
         game->pieceToMove = this;
         game->pieceToMove->getCurrentBox()->setColor(Qt::red);
         game->pieceToMove->moves();
+        qDebug() << game->pieceToMove->getCurrentBox()->getPosition();
     }
     //Consuming counterPart of the CHessBox
     else if(this->getSide() != game->pieceToMove->getSide()){
         this->getCurrentBox()->mousePressEvent(event);
+        // qDebug() << game->pieceToMove->getCurrentBox()->getPosition();
+        // QString moveData = game->pieceToMove->getCurrentBox()->getPosition();
+        // qDebug() << moveData;
+        // emit moveMade(moveData);
     }
-
-
 }
 
 void ChessPiece::setCurrentBox(ChessBox *box)

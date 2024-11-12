@@ -36,6 +36,8 @@ public:
     int rowLoc;
     int colLoc;
 
+    QString getPosition();
+
     ChessPiece * currentPiece;
 
 private:
