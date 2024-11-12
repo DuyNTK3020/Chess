@@ -240,11 +240,14 @@ void Game::displayLogin() {
             clientManager->sendLoginRequest(username, password);
         }
 
-        if (username == "1" && password == "1") {
-            start();  // Start the game if credentials match
-        } else {
-            qDebug() << "Invalid credentials!";
-        }
+        connect(clientManager, &ClientManager::loginResult, this, [=](bool success) {
+            if (success) {
+                start();  // Bắt đầu trò chơi nếu đăng nhập thành công
+            } else {
+                qDebug() << "Invalid credentials!";
+                // Thêm thông báo lỗi cho người dùng ở đây
+            }
+        });
     });
     addToScene(loginButton);
     listG.append(loginButton);

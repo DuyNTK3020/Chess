@@ -17,7 +17,7 @@ public:
 signals:
     void moveReceived(const QString &moveData);
     void registerResponseReceived(const QString &status, const QString &message);
-
+    void loginResult(bool success);
 private slots:
     void onReadyRead();
 

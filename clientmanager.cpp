@@ -44,6 +44,14 @@ void ClientManager::onReadyRead()
             QString message = jsonObj["message"].toString();
             emit registerResponseReceived(status, message);
         }
+        if (jsonObj.contains("type") && jsonObj["type"].toString() == "login_ack") {
+            QString status = jsonObj["status"].toString();
+            if (status == "success") {
+                emit loginResult(true);  // Đăng nhập thành công
+            } else {
+                emit loginResult(false);  // Đăng nhập thất bại
+            }
+        }
     }
 }
 
