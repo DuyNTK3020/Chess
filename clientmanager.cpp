@@ -33,14 +33,25 @@ void ClientManager::onReadyRead()
 {
     QString moveData = QString::fromUtf8(socket->readAll());
     emit moveReceived(moveData);
+
+    QJsonDocument doc = QJsonDocument::fromJson(moveData.toUtf8());
+    if (doc.isObject()) {
+        QJsonObject jsonObj = doc.object();
+        if (jsonObj.contains("type") && jsonObj["type"].toString() == "register_ack") {
+            QString status = jsonObj["status"].toString();
+            QString message = jsonObj["message"].toString();
+            emit registerResponseReceived(status, message);
+        }
+    }
 }
 
-void ClientManager::sendRegisterRequest(const QString &username, const QString &password)
+void ClientManager::sendRegisterRequest(const QString &name, const QString &username, const QString &password)
 {
     // Tạo đối tượng JSON để gửi
     QJsonObject json;
     json["type"] = "register";  // Loại yêu cầu là đăng ký
-    json["username"] = username;  // Tên người dùng
+    json["name"] = name;          // Tên người dùng
+    json["username"] = username;  // Tên tài khoản người dùng
     json["password"] = password;  // Mật khẩu người dùng
 
     // Chuyển đổi đối tượng JSON thành chuỗi byte (UTF-8)
@@ -53,6 +64,25 @@ void ClientManager::sendRegisterRequest(const QString &username, const QString &
         socket->write(data);
         socket->flush();  // Đảm bảo dữ liệu được gửi ngay lập tức
         qDebug() << "Sent register request:" << data;
+    } else {
+        qDebug() << "Socket not writable!";
+    }
+}
+
+void ClientManager::sendLoginRequest(const QString &username, const QString &password)
+{
+    QJsonObject json;
+    json["type"] = "login";
+    json["username"] = username;
+    json["password"] = password;
+
+    QJsonDocument doc(json);
+    QByteArray data = doc.toJson(QJsonDocument::Compact);
+
+    if (socket && socket->isWritable()) {
+        socket->write(data);
+        socket->flush();
+        qDebug() << "Sent login request:" << data;
     } else {
         qDebug() << "Socket not writable!";
     }

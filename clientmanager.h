@@ -11,11 +11,12 @@ public:
     explicit ClientManager(QObject *parent = nullptr);
     void connectToServer(const QString &host, int port);
     void sendMove(const QString &moveData);
-
-    void sendRegisterRequest(const QString &username, const QString &password);
+    void sendRegisterRequest(const QString &name, const QString &username, const QString &password);
+    void sendLoginRequest(const QString &username, const QString &password);
 
 signals:
     void moveReceived(const QString &moveData);
+    void registerResponseReceived(const QString &status, const QString &message);
 
 private slots:
     void onReadyRead();

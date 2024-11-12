@@ -237,8 +237,7 @@ void Game::displayLogin() {
         QString password = passwordInput->text();
 
         if (clientManager) {
-            QString message = "Username: " + username + ", Password: " + password;
-            clientManager->sendMove(message);
+            clientManager->sendLoginRequest(username, password);
         }
 
         if (username == "1" && password == "1") {
@@ -344,16 +343,11 @@ void Game::displayRegister() {
             return; // Dừng lại không thực hiện đăng ký
         }
 
-        // Đăng ký thành công
-        registerSuccess->setPlainText("Registration Successful!");
-        registerSuccess->setPos(width()/2 - registerSuccess->boundingRect().width()/2, 450);
-        errorText->setPlainText("");
-
         // Gọi phương thức gửi yêu cầu đăng ký đến server
-        clientManager->sendRegisterRequest(username, password);
+        if (clientManager) {
+            clientManager->sendRegisterRequest(name, username, password);
+        }
     });
-    addToScene(registerSuccess);
-
     addToScene(registerButton);
     listG.append(registerButton);
 
@@ -368,6 +362,17 @@ void Game::displayRegister() {
     });
     addToScene(loginButton);
     listG.append(loginButton);
+
+    // Kết nối tín hiệu từ ClientManager
+    connect(clientManager, &ClientManager::registerResponseReceived, this, [=](const QString &status, const QString &message) {
+        if (status == "success") {
+            registerSuccess->setPlainText(message);
+            errorText->setPlainText("");  // Xóa lỗi
+        } else if (status == "failure") {
+            errorText->setPlainText(message);
+            registerSuccess->setPlainText("");  // Xóa thông báo thành công
+        }
+    });
 }
 
 void Game::gameOver()
