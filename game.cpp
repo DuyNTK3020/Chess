@@ -9,48 +9,49 @@
 Game::Game(QWidget *parent ):QGraphicsView(parent)
 {
 
-    //Making the Scene
+    // Tạo Scene cho game
     gameScene = new QGraphicsScene();
     gameScene->setSceneRect(0,0,1400,900);
 
-    //Making the view
+    // Tạo view
     setFixedSize(1400,900);
-    setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff); // Tắt thanh cuộn ngang
+    setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);   // Tắt thanh cuộn dọc
     setScene(gameScene);
+
+    // Đặt màu nền là đen
     QBrush brush;
     brush.setStyle(Qt::SolidPattern);
     brush.setColor(Qt::black);
     setBackgroundBrush(brush);
     pieceToMove = NULL;
 
-    //display turn
+    // Hiển thị lượt đi hiện tại
     turnDisplay = new QGraphicsTextItem();
-    turnDisplay->setPos(width()/2-100,10);
+    turnDisplay->setPos(width()/2-100,10); // Vị trí của text hiển thị lượt
     turnDisplay->setZValue(1);
     turnDisplay->setDefaultTextColor(Qt::white);
     turnDisplay->setFont(QFont("",18));
     turnDisplay->setPlainText("Turn : WHITE");
 
-    //display Check
+    // Hiển thị thông báo "CHECK" (CHECK trong cờ vua là chiếu tướng)
     check = new QGraphicsTextItem();
-    check->setPos(width()/2-100,860);
+    check->setPos(width()/2-100,860); // Vị trí của thông báo "CHECK"
     check->setZValue(4);
     check->setDefaultTextColor(Qt::red);
     check->setFont(QFont("",18));
     check->setPlainText("CHECK!");
-    check->setVisible(false);
-    setTurn("WHITE");
+    check->setVisible(false); // Ẩn thông báo ban đầu
+    setTurn("WHITE"); // Thiết lập lượt đi ban đầu là "WHITE"
 
 }
 
 void Game::drawChessBoard()
 {
     chess = new ChessBoard();
-    drawDeadHolder(0,0,Qt::lightGray);
-    drawDeadHolder(1100,0,Qt::lightGray);
-     chess->drawBoxes(width()/2-400,50);
-
+    drawDeadHolder(0,0,Qt::lightGray);    // Khu vực chứa quân cờ trắng đã chết
+    drawDeadHolder(1100,0,Qt::lightGray); // Khu vực chứa quân cờ đen đã chết
+    chess->drawBoxes(width()/2-400,50);   // Vẽ bàn cờ ở vị trí trung tâm
 }
 
 void Game::displayDeadWhite()
@@ -63,7 +64,7 @@ void Game::displayDeadWhite()
                 k++;
                 j = 0;
             }
-            whiteDead[i]->setPos(40+SHIFT*j++,100+SHIFT*2*k);
+            whiteDead[i]->setPos(40+SHIFT*j++,100+SHIFT*2*k); // Đặt vị trí của quân cờ trắng đã chết
     }
 }
 
@@ -77,17 +78,18 @@ void Game::displayDeadBlack()
             k++;
             j = 0;
         }
-        blackDead[i]->setPos(1140+SHIFT*j++,100+SHIFT*2*k);
+        blackDead[i]->setPos(1140+SHIFT*j++,100+SHIFT*2*k); // Đặt vị trí của quân cờ đen đã chết
     }
 }
 
 void Game::placeInDeadPlace(ChessPiece *piece)
 {
+    // Kiểm tra quân cờ đã chết thuộc màu nào
     if(piece->getSide() == "WHITE") {
         whiteDead.append(piece);
         King *g = dynamic_cast <King *>(piece);
         if(g){
-
+            // Nếu quân vua trắng bị bắt, đen thắng
             check->setPlainText("Black Won");
             gameOver();
         }
@@ -97,34 +99,33 @@ void Game::placeInDeadPlace(ChessPiece *piece)
         blackDead.append(piece);
         King *g = dynamic_cast <King *>(piece);
         if(g){
-
+            // Nếu quân vua đen bị bắt, trắng thắng
             check->setPlainText("White Won");
             gameOver();
         }
         displayDeadBlack();
     }
-    alivePiece.removeAll(piece);
+    alivePiece.removeAll(piece); // Loại bỏ quân cờ đã chết khỏi danh sách quân cờ sống
 }
 
 void Game::addToScene(QGraphicsItem *item)
 {
-    gameScene->addItem(item);
+    gameScene->addItem(item); // Thêm đối tượng vào Scene
 }
 
 void Game::removeFromScene(QGraphicsItem *item)
 {
-    gameScene->removeItem(item);
-
+    gameScene->removeItem(item); // Xóa đối tượng khỏi Scene
 }
 
 QString Game::getTurn()
 {
-    return turn;
+    return turn; // Lấy lượt đi hiện tại
 }
 
 void Game::setTurn(QString value)
 {
-    turn = value;
+    turn = value; // Thiết lập lượt đi
 }
 
 void Game::changeTurn()
@@ -133,13 +134,13 @@ void Game::changeTurn()
         setTurn("BLACK");
     else
         setTurn("WHITE");
-    turnDisplay->setPlainText("Turn : " + getTurn());
+    turnDisplay->setPlainText("Turn : " + getTurn()); // Cập nhật hiển thị lượt
 }
 
 void Game::start()
 {
     for(size_t i =0, n = listG.size(); i < n; i++)
-        removeFromScene(listG[i]);
+        removeFromScene(listG[i]); // Xóa các đối tượng khỏi Scene
 
     addToScene(turnDisplay);
     QGraphicsTextItem* whitePiece = new QGraphicsTextItem();
@@ -157,36 +158,37 @@ void Game::start()
     blackPiece->setFont(QFont("",14));
     blackPiece->setPlainText("BLACK PIECE");
     addToScene(blackPiece);
-    addToScene(check);
-    chess->addChessPiece();
+    addToScene(check); // Thêm thông báo "CHECK"
+    chess->addChessPiece(); // Thêm các quân cờ vào bàn cờ
 }
 
 void Game::drawDeadHolder(int x, int y,QColor color)
 {
+    // Tạo vùng chứa quân cờ đã chết
     deadHolder = new QGraphicsRectItem(x,y,300,900);
     QBrush brush;
     brush.setStyle(Qt::SolidPattern);
     brush.setColor(color);
     deadHolder->setBrush(brush);
-    addToScene(deadHolder);
+    addToScene(deadHolder); // Thêm vùng chứa vào Scene
 }
 
 
 QList<ChessPiece*> Game::getAllChessPieces() {
-    return this->alivePiece; // Giả sử `allChessPieces` là danh sách chứa tất cả các quân cờ
+    return this->alivePiece; // Danh sách chứa tất cả các quân cờ
 }
 
 
+// Hàm hiển thị màn hình đăng nhập
 extern ClientManager *clientManager;
-void Game::displayMainMenu()
-{
-    // Clear previous items
+void Game::displayLogin() {
+    // Xóa các mục đã có
     for (auto item : listG) {
         removeFromScene(item);
     }
     listG.clear();
 
-    // Create background images and title text
+    // Tạo ảnh nền và tiêu đề
     QGraphicsPixmapItem *p = new QGraphicsPixmapItem();
     p->setPixmap(QPixmap(":/images/king1.png"));
     p->setPos(420,170);
@@ -200,7 +202,7 @@ void Game::displayMainMenu()
     listG.append(p1);
 
     QGraphicsTextItem *titleText = new QGraphicsTextItem("Chess Pro");
-    QFont titleFont("arial" , 50);
+    QFont titleFont("arial", 50);
     titleText->setFont(titleFont);
     int xPos = width()/2 - titleText->boundingRect().width()/2;
     int yPos = 150;
@@ -208,7 +210,7 @@ void Game::displayMainMenu()
     addToScene(titleText);
     listG.append(titleText);
 
-    // Create username input
+    // Tạo trường nhập tên người dùng
     QLineEdit *usernameInput = new QLineEdit();
     usernameInput->setPlaceholderText("Enter username");
     usernameInput->setFixedWidth(200);
@@ -216,16 +218,16 @@ void Game::displayMainMenu()
     proxyUsername->setPos(width()/2 - usernameInput->width()/2, 300);
     listG.append(proxyUsername);
 
-    // Create password input
+    // Tạo trường nhập mật khẩu
     QLineEdit *passwordInput = new QLineEdit();
     passwordInput->setPlaceholderText("Enter password");
-    passwordInput->setEchoMode(QLineEdit::Password); // Hide password input
+    passwordInput->setEchoMode(QLineEdit::Password); // Ẩn mật khẩu
     passwordInput->setFixedWidth(200);
     QGraphicsProxyWidget *proxyPassword = gameScene->addWidget(passwordInput);
     proxyPassword->setPos(width()/2 - passwordInput->width()/2, 350);
     listG.append(proxyPassword);
 
-    // Create login button
+    // Nút đăng nhập
     Button *loginButton = new Button("Login");
     int btnXPos = width()/2 - loginButton->boundingRect().width()/2;
     int btnYPos = 400;
@@ -239,7 +241,7 @@ void Game::displayMainMenu()
             clientManager->sendMove(message);
         }
 
-        if (username == "user" && password == "password") {
+        if (username == "1" && password == "1") {
             start();  // Start the game if credentials match
         } else {
             qDebug() << "Invalid credentials!";
@@ -248,12 +250,99 @@ void Game::displayMainMenu()
     addToScene(loginButton);
     listG.append(loginButton);
 
+    // Nút đăng ký
+    Button *registerButton = new Button("Register");
+    registerButton->setPos(btnXPos, btnYPos + 50);
+    connect(registerButton, &Button::clicked, this, &Game::displayRegister);
+    addToScene(registerButton);
+    listG.append(registerButton);
+
     drawChessBoard();
+}
+
+// Hàm hiển thị màn hình đăng ký
+void Game::displayRegister() {
+    // Xóa các mục hiện tại
+    for (auto item : listG) {
+        removeFromScene(item);
+    }
+    listG.clear();
+
+    // Tiêu đề
+    QGraphicsTextItem *registerTitle = new QGraphicsTextItem("Register");
+    QFont registerFont("arial", 40);
+    registerTitle->setFont(registerFont);
+    registerTitle->setPos(width()/2 - registerTitle->boundingRect().width()/2, 100);
+    addToScene(registerTitle);
+    listG.append(registerTitle);
+
+    // Trường nhập tên
+    QLineEdit *nameInput = new QLineEdit();
+    nameInput->setPlaceholderText("Enter your name");
+    nameInput->setFixedWidth(200);
+    QGraphicsProxyWidget *proxyName = gameScene->addWidget(nameInput);
+    proxyName->setPos(width()/2 - nameInput->width()/2, 200);
+    listG.append(proxyName);
+
+    // Trường nhập tài khoản
+    QLineEdit *usernameInput = new QLineEdit();
+    usernameInput->setPlaceholderText("Enter username");
+    usernameInput->setFixedWidth(200);
+    QGraphicsProxyWidget *proxyUsername = gameScene->addWidget(usernameInput);
+    proxyUsername->setPos(width()/2 - usernameInput->width()/2, 250);
+    listG.append(proxyUsername);
+
+    // Trường nhập mật khẩu
+    QLineEdit *passwordInput = new QLineEdit();
+    passwordInput->setPlaceholderText("Enter password");
+    passwordInput->setEchoMode(QLineEdit::Password); // Ẩn mật khẩu
+    passwordInput->setFixedWidth(200);
+    QGraphicsProxyWidget *proxyPassword = gameScene->addWidget(passwordInput);
+    proxyPassword->setPos(width()/2 - passwordInput->width()/2, 300);
+    listG.append(proxyPassword);
+
+    // Trường xác nhận mật khẩu
+    QLineEdit *confirmPasswordInput = new QLineEdit();
+    confirmPasswordInput->setPlaceholderText("Confirm password");
+    confirmPasswordInput->setEchoMode(QLineEdit::Password); // Ẩn mật khẩu
+    confirmPasswordInput->setFixedWidth(200);
+    QGraphicsProxyWidget *proxyConfirmPassword = gameScene->addWidget(confirmPasswordInput);
+    proxyConfirmPassword->setPos(width()/2 - confirmPasswordInput->width()/2, 350);
+    listG.append(proxyConfirmPassword);
+
+    // Nút đăng ký
+    Button *registerButton = new Button("Register");
+    registerButton->setPos(width()/2 - registerButton->boundingRect().width()/2, 400);
+    connect(registerButton, &Button::clicked, this, [=]() {
+        QString username = usernameInput->text();
+        QString password = passwordInput->text();
+        QString confirmPassword = confirmPasswordInput->text();
+
+        if (password != confirmPassword) {
+            qDebug() << "Passwords do not match!";
+            return;
+        }
+
+        // Đăng ký thành công
+        QGraphicsTextItem *registerSuccess = new QGraphicsTextItem("Registration Successful!");
+        registerSuccess->setDefaultTextColor(Qt::green);
+        registerSuccess->setPos(width()/2 - registerSuccess->boundingRect().width()/2, 450);
+        addToScene(registerSuccess);
+
+        // Quay lại màn hình đăng nhập
+        Button *loginButton = new Button("Back to Login");
+        loginButton->setPos(width()/2 - loginButton->boundingRect().width()/2, 500);
+        connect(loginButton, &Button::clicked, this, &Game::displayLogin);
+        addToScene(loginButton);
+        listG.append(loginButton);
+    });
+    addToScene(registerButton);
+    listG.append(registerButton);
 }
 
 void Game::gameOver()
 {
-    //removeAll();
+    // removeAll();
     setTurn("WHITE");
     alivePiece.clear();
     chess->reset();

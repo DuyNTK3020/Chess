@@ -35,7 +35,8 @@ public:
     ChessBox *collection[8][8];
     QGraphicsTextItem *check;
     QList <ChessPiece *> alivePiece;
-    void displayMainMenu();
+    void displayLogin();
+    void displayRegister();
 
     void gameOver();
     void removeAll();
