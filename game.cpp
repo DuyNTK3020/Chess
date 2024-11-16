@@ -241,7 +241,7 @@ void Game::displayLogin() {
 
         connect(clientManager, &ClientManager::loginResult, this, [=](bool success) {
             if (success) {
-                start();
+                displayWaitConnect();
             } else {
                 qDebug() << "login fail!";
             }
