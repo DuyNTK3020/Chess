@@ -6,9 +6,9 @@
 #include <QLineEdit>
 #include <QGraphicsProxyWidget>
 #include "clientmanager.h"
+
 Game::Game(QWidget *parent ):QGraphicsView(parent)
 {
-
     // Tạo Scene cho game
     gameScene = new QGraphicsScene();
     gameScene->setSceneRect(0,0,1400,900);
@@ -60,11 +60,11 @@ void Game::displayDeadWhite()
     int j = 0;
     int k = 0;
     for(size_t i = 0,n = whiteDead.size(); i<n; i++) {
-            if(j == 4){
-                k++;
-                j = 0;
-            }
-            whiteDead[i]->setPos(40+SHIFT*j++,100+SHIFT*2*k); // Đặt vị trí của quân cờ trắng đã chết
+        if(j == 4){
+            k++;
+            j = 0;
+        }
+        whiteDead[i]->setPos(40+SHIFT*j++,100+SHIFT*2*k); // Đặt vị trí của quân cờ trắng đã chết
     }
 }
 
@@ -139,8 +139,8 @@ void Game::changeTurn()
 
 void Game::start()
 {
-    for(size_t i =0, n = listG.size(); i < n; i++)
-        removeFromScene(listG[i]); // Xóa các đối tượng khỏi Scene
+    // Xóa các đối tượng khỏi Scene
+    clearScene();
 
     addToScene(turnDisplay);
     QGraphicsTextItem* whitePiece = new QGraphicsTextItem();
@@ -182,11 +182,10 @@ QList<ChessPiece*> Game::getAllChessPieces() {
 // Hàm hiển thị màn hình đăng nhập
 extern ClientManager *clientManager;
 void Game::displayLogin() {
+    drawChessBoard();
+
     // Xóa các mục đã có
-    for (auto item : listG) {
-        removeFromScene(item);
-    }
-    listG.clear();
+    clearScene();
 
     // Tạo ảnh nền và tiêu đề
     QGraphicsPixmapItem *p = new QGraphicsPixmapItem();
@@ -242,10 +241,9 @@ void Game::displayLogin() {
 
         connect(clientManager, &ClientManager::loginResult, this, [=](bool success) {
             if (success) {
-                start();  // Bắt đầu trò chơi nếu đăng nhập thành công
+                start();
             } else {
-                qDebug() << "Invalid credentials!";
-                // Thêm thông báo lỗi cho người dùng ở đây
+                qDebug() << "login fail!";
             }
         });
     });
@@ -258,16 +256,13 @@ void Game::displayLogin() {
     connect(registerButton, &Button::clicked, this, &Game::displayRegister);
     addToScene(registerButton);
     listG.append(registerButton);
-
-    drawChessBoard();
 }
 
 void Game::displayRegister() {
+    drawChessBoard();
+
     // Xóa các mục hiện tại
-    for (auto item : listG) {
-        removeFromScene(item);
-    }
-    listG.clear();
+    clearScene();
 
     // Tiêu đề
     QGraphicsTextItem *registerTitle = new QGraphicsTextItem("Register");
@@ -313,13 +308,13 @@ void Game::displayRegister() {
 
     QGraphicsTextItem *errorText = new QGraphicsTextItem("");
     errorText->setDefaultTextColor(Qt::red);
-    errorText->setPos(width()/2 - registerTitle->boundingRect().width()/2 + 25, 450);
+    errorText->setPos(width()/2 - errorText->boundingRect().width()/2 + 25, 450);
     addToScene(errorText);
     listG.append(errorText);
 
     QGraphicsTextItem *registerSuccess = new QGraphicsTextItem("");
     registerSuccess->setDefaultTextColor(Qt::green);
-    registerSuccess->setPos(width()/2 - registerTitle->boundingRect().width()/2 + 25, 450);
+    registerSuccess->setPos(width()/2 - registerSuccess->boundingRect().width()/2 + 25, 450);
     addToScene(registerSuccess);
     listG.append(registerSuccess);
 
@@ -378,6 +373,43 @@ void Game::displayRegister() {
     });
 }
 
+
+void Game::displayWaitConnect() {
+    drawChessBoard();
+
+    clearScene();
+
+    QGraphicsTextItem *titleText = new QGraphicsTextItem("Connect");
+    QFont titleFont("arial", 50);
+    titleText->setFont(titleFont);
+    int xPos = width()/2 - titleText->boundingRect().width()/2;
+    int yPos = 150;
+    titleText->setPos(xPos, yPos);
+    addToScene(titleText);
+    listG.append(titleText);
+
+    QGraphicsTextItem *connectingText = new QGraphicsTextItem("Connecting to server...");
+    connectingText->setFont(QFont("arial", 18));
+    connectingText->setPos(width() / 2 - connectingText->boundingRect().width()/2, height() / 2 - 50);
+    addToScene(connectingText);
+    listG.append(connectingText);
+
+    // Gửi yêu cầu connect với token giả định (có thể thay đổi)
+    if (clientManager) {
+        clientManager->sendConnectRequest("xyz123");
+    }
+
+    // Kết nối tín hiệu từ ClientManager
+    connect(clientManager, &ClientManager::connectionResult, this, [=](const QString &status, const QString &message) {
+        if (status == "success") {
+            start();
+        } else if (status == "failure") {
+            connectingText->setDefaultTextColor(Qt::red);
+            connectingText->setPlainText(message);
+        }
+    });
+}
+
 void Game::gameOver()
 {
     // removeAll();
@@ -394,6 +426,13 @@ void Game::removeAll(){
     QList<QGraphicsItem*> itemsList = gameScene->items();
     for(size_t i = 0, n = itemsList.size();i<n;i++) {
         if(itemsList[i]!=check)
-          removeFromScene(itemsList[i]);
+            removeFromScene(itemsList[i]);
     }
+}
+
+void Game::clearScene() {
+    for (auto item : listG) {
+        removeFromScene(item);
+    }
+    listG.clear();
 }

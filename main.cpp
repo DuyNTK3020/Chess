@@ -17,6 +17,7 @@ int main(int argc, char *argv[])
     game = new Game();
     game->show();
     game->displayLogin();
+    // game->displayWaitConnect();
 
     // Kết nối tín hiệu `moveMade` của tất cả các `ChessPiece` với `ClientManager`
     // for (ChessPiece* piece : game->getAllChessPieces()) { // Giả sử bạn có phương thức để lấy tất cả các quân cờ

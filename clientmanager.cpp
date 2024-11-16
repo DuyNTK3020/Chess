@@ -42,6 +42,7 @@ void ClientManager::onReadyRead()
         if (jsonObj.contains("type") && jsonObj["type"].toString() == "register_ack") {
             QString status = jsonObj["status"].toString();
             QString message = jsonObj["message"].toString();
+            qDebug() << "Connection " << status << ": " << message;
             emit registerResponseReceived(status, message);
         }
         if (jsonObj.contains("type") && jsonObj["type"].toString() == "login_ack") {
@@ -51,6 +52,12 @@ void ClientManager::onReadyRead()
             } else {
                 emit loginResult(false);  // Đăng nhập thất bại
             }
+        }
+        if (jsonObj.contains("type") && jsonObj["type"].toString() == "connect_ack") {
+            QString status = jsonObj["status"].toString();
+            QString message = jsonObj["message"].toString();
+            qDebug() << "Connection " << status << ": " << message;
+            emit connectionResult(status, message); // Phát tín hiệu kết nối thành công
         }
     }
 }
@@ -93,6 +100,24 @@ void ClientManager::sendLoginRequest(const QString &username, const QString &pas
         socket->write(data);
         socket->flush();
         qDebug() << "Sent login request:" << data;
+    } else {
+        qDebug() << "Socket not writable!";
+    }
+}
+
+void ClientManager::sendConnectRequest(const QString &token)
+{
+    QJsonObject json;
+    json["type"] = "connect";
+    json["token"] = token;
+
+    QJsonDocument doc(json);
+    QByteArray data = doc.toJson(QJsonDocument::Compact);
+
+    if (socket && socket->isWritable()) {
+        socket->write(data);
+        socket->flush();
+        qDebug() << "Sent connect request:" << data;
     } else {
         qDebug() << "Socket not writable!";
     }

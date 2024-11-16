@@ -37,9 +37,11 @@ public:
     QList <ChessPiece *> alivePiece;
     void displayLogin();
     void displayRegister();
+    void displayWaitConnect();
 
     void gameOver();
     void removeAll();
+    void clearScene();
 public slots:
     void start();
 private:
