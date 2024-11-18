@@ -1,13 +1,18 @@
 #include <QApplication>
 #include "game.h"
 #include "clientmanager.h"
+#include "user.h"
 
 Game *game;
 ClientManager *clientManager;
+User *user;
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+
+    // Tạo user
+    user = new User();
 
     // Khởi tạo ClientManager và kết nối tới server
     clientManager = new ClientManager();
@@ -16,8 +21,8 @@ int main(int argc, char *argv[])
     // Khởi tạo game
     game = new Game();
     game->show();
-    game->displayLogin();
-    // game->displayWaitConnect();
+    // game->displayLogin();
+    game->displayRoom("1000");
 
     // Kết nối tín hiệu `moveMade` của tất cả các `ChessPiece` với `ClientManager`
     // for (ChessPiece* piece : game->getAllChessPieces()) { // Giả sử bạn có phương thức để lấy tất cả các quân cờ

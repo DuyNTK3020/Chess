@@ -6,6 +6,7 @@
 #include <QLineEdit>
 #include <QGraphicsProxyWidget>
 #include "clientmanager.h"
+#include "user.h"
 
 Game::Game(QWidget *parent ):QGraphicsView(parent)
 {
@@ -137,7 +138,7 @@ void Game::changeTurn()
     turnDisplay->setPlainText("Turn : " + getTurn()); // Cập nhật hiển thị lượt
 }
 
-void Game::start()
+void Game::start(const QString &status, const QString &room, const QString &competitor, const QString &role)
 {
     // Xóa các đối tượng khỏi Scene
     clearScene();
@@ -181,6 +182,7 @@ QList<ChessPiece*> Game::getAllChessPieces() {
 
 // Hàm hiển thị màn hình đăng nhập
 extern ClientManager *clientManager;
+extern User *user;
 void Game::displayLogin() {
     drawChessBoard();
 
@@ -414,13 +416,15 @@ void Game::displayWaitConnect() {
 
     // Gửi yêu cầu connect với token giả định (có thể thay đổi)
     if (clientManager) {
-        clientManager->sendConnectRequest("xyz123");
+        // Set sau
+        user->setToken("hihi");
+        clientManager->sendConnectRequest(user->getToken());
     }
 
     // Kết nối tín hiệu từ ClientManager
     connect(clientManager, &ClientManager::connectionResult, this, [=](const QString &status, const QString &message) {
         if (status == "success") {
-            start();
+            displayMenu();
         } else if (status == "failure") {
             connectingText->setDefaultTextColor(Qt::red);
             connectingText->setPlainText(message);
@@ -442,33 +446,134 @@ void Game::displayMenu() {
     addToScene(titleText);
     listG.append(titleText);
 
+    QGraphicsTextItem *errorText = new QGraphicsTextItem("");
+    errorText->setDefaultTextColor(Qt::red);
+    errorText->setPos(width()/2, 450);
+    addToScene(errorText);
+    listG.append(errorText);
+
     // Nút tìm trận
     Button *findMatchButton = new Button("Find Match");
     int btnXPos = width()/2 - findMatchButton->boundingRect().width()/2;
     int btnYPos = 400;
     findMatchButton->setPos(btnXPos, btnYPos);
-    connect(findMatchButton, &Button::clicked, this, [=]() {
-        if (clientManager) {
-            // clientManager->sendFindMatchRequest();
+    // Gửi yêu cầu connect với token giả định (có thể thay đổi)
+    if (clientManager) {
+        // Set sau
+        user->setToken("hihi");
+        clientManager->sendConnectRequest(user->getToken());
+    }
+
+    // Kết nối tín hiệu từ ClientManager
+    connect(clientManager, &ClientManager::findMatchResult, this, [=](const QString &status, const QString &room, const QString &competitor, const QString &role) {
+        if (status == "success") {
+            start(status, room, competitor, role);
+        } else if (status == "failure") {
+            errorText->setPlainText("Error: Cannot find a match.");
+            errorText->setPos(width()/2 - errorText->boundingRect().width()/2, 450);
+            return;
         }
-
-        connect(clientManager, &ClientManager::loginResult, this, [=](bool success) {
-            if (success) {
-                displayWaitConnect();
-            } else {
-                qDebug() << "login fail!";
-            }
-        });
     });
-    addToScene(loginButton);
-    listG.append(loginButton);
+    addToScene(findMatchButton);
+    listG.append(findMatchButton);
 
-    // Nút đăng ký
-    Button *registerButton = new Button("Register");
-    registerButton->setPos(btnXPos, btnYPos + 100);
-    connect(registerButton, &Button::clicked, this, &Game::displayRegister);
-    addToScene(registerButton);
-    listG.append(registerButton);
+    // Nút tạo phòng
+    Button *createRoomButton = new Button("Create Room");
+    createRoomButton->setPos(btnXPos, btnYPos + 100);
+    connect(createRoomButton, &Button::clicked, this, [=]() {
+        if (clientManager) {
+            clientManager->sendCreateRoomRequest(user->getUsername());
+        }
+    });
+    addToScene(createRoomButton);
+    listG.append(createRoomButton);
+
+    connect(clientManager, &ClientManager::findMatchResult, this, [=](const QString &status, const QString &room) {
+        if (status == "success") {
+            displayRoom(room);
+        } else if (status == "failure") {
+            errorText->setPlainText("Error: Cannot create a room.");
+            errorText->setPos(width()/2 - errorText->boundingRect().width()/2, 450);
+        }
+    });
+}
+
+void Game::displayRoom(const QString &room) {
+    drawChessBoard();
+
+    clearScene();
+
+    QGraphicsTextItem *titleText = new QGraphicsTextItem("Room: " + room);
+    QFont titleFont("arial", 50);
+    titleText->setFont(titleFont);
+    int xPos = width()/2 - titleText->boundingRect().width()/2;
+    int yPos = 150;
+    titleText->setPos(xPos, yPos);
+    addToScene(titleText);
+    listG.append(titleText);
+
+    QGraphicsTextItem *errorText = new QGraphicsTextItem("");
+    errorText->setDefaultTextColor(Qt::red);
+    errorText->setPos(width()/2, 450);
+    addToScene(errorText);
+    listG.append(errorText);
+
+    // Hiển thị thông tin người chơi trong phòng
+    QGraphicsRectItem* player1Background = new QGraphicsRectItem(350, 250, 300, 100);
+    player1Background->setBrush(QBrush(Qt::white));
+    addToScene(player1Background);
+    listG.append(player1Background);
+
+    QGraphicsRectItem* player2Background = new QGraphicsRectItem(350, 450, 300, 100);
+    player2Background->setBrush(QBrush(Qt::white));
+    addToScene(player2Background);
+    listG.append(player2Background);
+
+    QFont playerFont("arial", 15);
+    QGraphicsTextItem *player1Name = new QGraphicsTextItem("Player 1: Empty");
+    player1Name->setFont(playerFont);
+    player1Name->setDefaultTextColor(Qt::black);
+    player1Name->setPos(400, 265);
+    addToScene(player1Name);
+    listG.append(player1Name);
+
+    QGraphicsTextItem *player1Elo = new QGraphicsTextItem("Elo: Empty");
+    player1Elo->setFont(playerFont);
+    player1Elo->setDefaultTextColor(Qt::red);
+    player1Elo->setPos(400, 305);
+    addToScene(player1Elo);
+    listG.append(player1Elo);
+
+    QGraphicsTextItem *player2Name = new QGraphicsTextItem("Player 2: Empty");
+    player2Name->setFont(playerFont);
+    player2Name->setDefaultTextColor(Qt::black);
+    player2Name->setPos(400, 465);
+    addToScene(player2Name);
+    listG.append(player2Name);
+
+    QGraphicsTextItem *player2Elo = new QGraphicsTextItem("Elo: Empty");
+    player2Elo->setFont(playerFont);
+    player2Elo->setDefaultTextColor(Qt::red);
+    player2Elo->setPos(400, 505);
+    addToScene(player2Elo);
+    listG.append(player2Elo);
+
+    // Hiển thị danh sách chờ
+    QGraphicsTextItem *listPlayerLabel = new QGraphicsTextItem("List Player:");
+    listPlayerLabel->setDefaultTextColor(Qt::black);
+    listPlayerLabel->setFont(playerFont);
+    listPlayerLabel->setPos(800, 250);
+    addToScene(listPlayerLabel);
+    listG.append(listPlayerLabel);
+
+    // Nút Start (disabled ban đầu)
+    Button *startButton = new Button("Start");
+    startButton->setPos(400, 600);
+    startButton->setEnabled(false);
+    connect(startButton, &Button::clicked, this, []() {
+        qDebug() << "Game started!";
+    });
+    addToScene(startButton);
 }
 
 void Game::gameOver()

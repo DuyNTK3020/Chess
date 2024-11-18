@@ -59,6 +59,26 @@ void ClientManager::onReadyRead()
             qDebug() << "Connection " << status << ": " << message;
             emit connectionResult(status, message); // Phát tín hiệu kết nối thành công
         }
+        if (jsonObj.contains("type") && jsonObj["type"].toString() == "find_match_ack") {
+            QString status = jsonObj["status"].toString();
+            QString room = jsonObj["room"].toString();
+            QString competitor = jsonObj["competitor"].toString();
+            QString role = jsonObj["role"].toString();
+            if (status == "success") {
+                emit findMatchResult(status, room, competitor, role);
+            } else {
+                emit findMatchResult(status, "", "", "");
+            }
+        }
+        // if (jsonObj.contains("type") && jsonObj["type"].toString() == "create_room_ack") {
+        //     QString status = jsonObj["status"].toString();
+        //     QString room = jsonObj["room"].toString();
+        //     if (status == "success") {
+        //         emit createRoomResult(status, room);
+        //     } else {
+        //         emit createRoomResult(status, "");
+        //     }
+        // }
     }
 }
 
@@ -110,6 +130,42 @@ void ClientManager::sendConnectRequest(const QString &token)
     QJsonObject json;
     json["type"] = "connect";
     json["token"] = token;
+
+    QJsonDocument doc(json);
+    QByteArray data = doc.toJson(QJsonDocument::Compact);
+
+    if (socket && socket->isWritable()) {
+        socket->write(data);
+        socket->flush();
+        qDebug() << "Sent connect request:" << data;
+    } else {
+        qDebug() << "Socket not writable!";
+    }
+}
+
+void ClientManager::sendFindMatchRequest(const QString &username)
+{
+    QJsonObject json;
+    json["type"] = "find_match";
+    json["username"] = username;
+
+    QJsonDocument doc(json);
+    QByteArray data = doc.toJson(QJsonDocument::Compact);
+
+    if (socket && socket->isWritable()) {
+        socket->write(data);
+        socket->flush();
+        qDebug() << "Sent connect request:" << data;
+    } else {
+        qDebug() << "Socket not writable!";
+    }
+}
+
+void ClientManager::sendCreateRoomRequest(const QString &username)
+{
+    QJsonObject json;
+    json["type"] = "create_room";
+    json["username"] = username;
 
     QJsonDocument doc(json);
     QByteArray data = doc.toJson(QJsonDocument::Compact);

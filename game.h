@@ -39,12 +39,13 @@ public:
     void displayRegister();
     void displayWaitConnect();
     void displayMenu();
+    void displayRoom(const QString &room);
 
     void gameOver();
     void removeAll();
     void clearScene();
 public slots:
-    void start();
+    void start(const QString &status, const QString &room, const QString &competitor, const QString &role);
 private:
     QGraphicsScene *gameScene;
     QList <ChessPiece *> whiteDead;
