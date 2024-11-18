@@ -226,6 +226,12 @@ void Game::displayLogin() {
     proxyPassword->setPos(width()/2 - passwordInput->width()/2, 350);
     listG.append(proxyPassword);
 
+    QGraphicsTextItem *errorText = new QGraphicsTextItem("");
+    errorText->setDefaultTextColor(Qt::red);
+    errorText->setPos(width()/2 - 50, 450);
+    addToScene(errorText);
+    listG.append(errorText);
+
     // Nút đăng nhập
     Button *loginButton = new Button("Login");
     int btnXPos = width()/2 - loginButton->boundingRect().width()/2;
@@ -234,6 +240,14 @@ void Game::displayLogin() {
     connect(loginButton, &Button::clicked, this, [=]() {
         QString username = usernameInput->text();
         QString password = passwordInput->text();
+
+        // Kiểm tra nếu có trường nào còn trống
+        if (username.isEmpty() || password.isEmpty()) {
+            qDebug() << "All fields must be filled!";
+            errorText->setPlainText("All fields must be filled!");
+            errorText->setPos(width()/2 - errorText->boundingRect().width()/2, 450);
+            return; // Dừng lại không thực hiện đăng ký
+        }
 
         if (clientManager) {
             clientManager->sendLoginRequest(username, password);
@@ -308,13 +322,13 @@ void Game::displayRegister() {
 
     QGraphicsTextItem *errorText = new QGraphicsTextItem("");
     errorText->setDefaultTextColor(Qt::red);
-    errorText->setPos(width()/2 - errorText->boundingRect().width()/2 + 25, 450);
+    errorText->setPos(width()/2, 450);
     addToScene(errorText);
     listG.append(errorText);
 
     QGraphicsTextItem *registerSuccess = new QGraphicsTextItem("");
     registerSuccess->setDefaultTextColor(Qt::green);
-    registerSuccess->setPos(width()/2 - registerSuccess->boundingRect().width()/2 + 25, 450);
+    registerSuccess->setPos(width()/2, 450);
     addToScene(registerSuccess);
     listG.append(registerSuccess);
 
@@ -331,6 +345,7 @@ void Game::displayRegister() {
         if (name.isEmpty() || username.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
             qDebug() << "All fields must be filled!";
             errorText->setPlainText("All fields must be filled!");
+            errorText->setPos(width()/2 - errorText->boundingRect().width()/2, 450);
             return; // Dừng lại không thực hiện đăng ký
         }
 
@@ -338,6 +353,7 @@ void Game::displayRegister() {
         if (password != confirmPassword) {
             qDebug() << "Passwords do not match!";
             errorText->setPlainText("Passwords do not match!");
+            errorText->setPos(width()/2 - errorText->boundingRect().width()/2, 450);
             return; // Dừng lại không thực hiện đăng ký
         }
 
@@ -365,9 +381,11 @@ void Game::displayRegister() {
     connect(clientManager, &ClientManager::registerResponseReceived, this, [=](const QString &status, const QString &message) {
         if (status == "success") {
             registerSuccess->setPlainText(message);
+            registerSuccess->setPos(width()/2 - registerSuccess->boundingRect().width()/2, 450);
             errorText->setPlainText("");  // Xóa lỗi
         } else if (status == "failure") {
             errorText->setPlainText(message);
+            errorText->setPos(width()/2 - errorText->boundingRect().width()/2, 450);
             registerSuccess->setPlainText("");  // Xóa thông báo thành công
         }
     });
