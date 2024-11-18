@@ -2,12 +2,12 @@
 
 // Constructor
 User::User()
-    : username(""), name(""), password(""), elo(0)
+    : username(""), name(""), password(""), elo(0), token("")
 {
 }
 
-User::User(const QString &username, const QString &name, const QString &password, int elo)
-    : username(username), name(name), password(password), elo(elo)
+User::User(const QString &username, const QString &name, const QString &password, int elo, const QString token)
+    : username(username), name(name), password(password), elo(elo), token(token)
 {
 }
 
@@ -28,6 +28,11 @@ int User::getElo() const {
     return elo;
 }
 
+QString User::getToken() const {
+    return token;
+}
+
+
 // Setters
 void User::setUsername(const QString &username) {
     this->username = username;
@@ -43,4 +48,8 @@ void User::setPassword(const QString &password) {
 
 void User::setElo(int elo) {
     this->elo = elo;
+}
+
+void User::setToken(const QString &token) {
+    this->token = token;
 }
