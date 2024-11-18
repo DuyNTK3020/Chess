@@ -19,6 +19,7 @@ SOURCES += main.cpp \
     chessbox.cpp \
     chessboard.cpp \
     chesspiece.cpp \
+    player.cpp \
     queen.cpp \
     pawn.cpp \
     bishop.cpp \
@@ -34,6 +35,7 @@ HEADERS  += \
     chessbox.h \
     chessboard.h \
     chesspiece.h \
+    player.h \
     queen.h \
     pawn.h \
     bishop.h \
