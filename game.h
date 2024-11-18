@@ -38,6 +38,7 @@ public:
     void displayLogin();
     void displayRegister();
     void displayWaitConnect();
+    void displayMenu();
 
     void gameOver();
     void removeAll();

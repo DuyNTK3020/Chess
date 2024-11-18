@@ -397,7 +397,7 @@ void Game::displayWaitConnect() {
 
     clearScene();
 
-    QGraphicsTextItem *titleText = new QGraphicsTextItem("Connect");
+    QGraphicsTextItem *titleText = new QGraphicsTextItem("Menu");
     QFont titleFont("arial", 50);
     titleText->setFont(titleFont);
     int xPos = width()/2 - titleText->boundingRect().width()/2;
@@ -426,6 +426,49 @@ void Game::displayWaitConnect() {
             connectingText->setPlainText(message);
         }
     });
+}
+
+void Game::displayMenu() {
+    drawChessBoard();
+
+    clearScene();
+
+    QGraphicsTextItem *titleText = new QGraphicsTextItem("Chess Pro");
+    QFont titleFont("arial", 50);
+    titleText->setFont(titleFont);
+    int xPos = width()/2 - titleText->boundingRect().width()/2;
+    int yPos = 150;
+    titleText->setPos(xPos, yPos);
+    addToScene(titleText);
+    listG.append(titleText);
+
+    // Nút tìm trận
+    Button *findMatchButton = new Button("Find Match");
+    int btnXPos = width()/2 - findMatchButton->boundingRect().width()/2;
+    int btnYPos = 400;
+    findMatchButton->setPos(btnXPos, btnYPos);
+    connect(findMatchButton, &Button::clicked, this, [=]() {
+        if (clientManager) {
+            // clientManager->sendFindMatchRequest();
+        }
+
+        connect(clientManager, &ClientManager::loginResult, this, [=](bool success) {
+            if (success) {
+                displayWaitConnect();
+            } else {
+                qDebug() << "login fail!";
+            }
+        });
+    });
+    addToScene(loginButton);
+    listG.append(loginButton);
+
+    // Nút đăng ký
+    Button *registerButton = new Button("Register");
+    registerButton->setPos(btnXPos, btnYPos + 100);
+    connect(registerButton, &Button::clicked, this, &Game::displayRegister);
+    addToScene(registerButton);
+    listG.append(registerButton);
 }
 
 void Game::gameOver()
