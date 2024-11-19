@@ -49,3 +49,10 @@ void Button::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
     setBrush(brush);
     }
 }
+
+void Button::alignText(int x, int y)
+{
+    int xPos = rect().width() / 2 - text->boundingRect().width() / 2 + x;
+    int yPos = rect().height() / 2 - text->boundingRect().height() / 2 + y;
+    text->setPos(xPos, yPos);
+}

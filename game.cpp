@@ -7,6 +7,13 @@
 #include <QGraphicsProxyWidget>
 #include "clientmanager.h"
 #include "user.h"
+#include "player.h"
+#include <QScrollArea>
+#include <QVBoxLayout>
+#include <QLabel>
+#include <QPushButton>
+#include <QGraphicsProxyWidget>
+#include <QScrollBar>
 
 Game::Game(QWidget *parent ):QGraphicsView(parent)
 {
@@ -183,6 +190,7 @@ QList<ChessPiece*> Game::getAllChessPieces() {
 // Hàm hiển thị màn hình đăng nhập
 extern ClientManager *clientManager;
 extern User *user;
+extern QList<Player*> players;
 void Game::displayLogin() {
     drawChessBoard();
 
@@ -498,12 +506,12 @@ void Game::displayMenu() {
     });
 }
 
-void Game::displayRoom(const QString &room) {
+void Game::displayRoom(const QString &roomID) {
     drawChessBoard();
 
     clearScene();
 
-    QGraphicsTextItem *titleText = new QGraphicsTextItem("Room: " + room);
+    QGraphicsTextItem *titleText = new QGraphicsTextItem("Room: " + roomID);
     QFont titleFont("arial", 50);
     titleText->setFont(titleFont);
     int xPos = width()/2 - titleText->boundingRect().width()/2;
@@ -558,13 +566,73 @@ void Game::displayRoom(const QString &room) {
     addToScene(player2Elo);
     listG.append(player2Elo);
 
-    // Hiển thị danh sách chờ
-    QGraphicsTextItem *listPlayerLabel = new QGraphicsTextItem("List Player:");
-    listPlayerLabel->setDefaultTextColor(Qt::black);
-    listPlayerLabel->setFont(playerFont);
-    listPlayerLabel->setPos(800, 250);
-    addToScene(listPlayerLabel);
-    listG.append(listPlayerLabel);
+    QGraphicsRectItem* listPlayerBackground = new QGraphicsRectItem(750, 249, 302, 300);
+    listPlayerBackground->setBrush(QBrush(Qt::white));
+    addToScene(listPlayerBackground);
+    listG.append(listPlayerBackground);
+
+    // Scene riêng cho danh sách người chơi
+    QGraphicsScene *listPlayerScene = new QGraphicsScene();
+    int yOffset = 0;
+
+    for (Player *player : players) {
+        // Tạo nhóm hiển thị
+        QGraphicsItemGroup *playerGroup = new QGraphicsItemGroup();
+
+        // Tạo nền màu
+        QGraphicsRectItem *background = new QGraphicsRectItem(0, yOffset, 275, 50);
+        background->setBrush(QBrush(QColor(238, 238, 238)));
+        background->setPen(Qt::NoPen);
+        playerGroup->addToGroup(background);
+
+        QGraphicsTextItem *nameItem = new QGraphicsTextItem(player->getName(), background);
+        nameItem->setFont(QFont("Arial", 16, QFont::Bold));
+        nameItem->setDefaultTextColor(Qt::white);
+        nameItem->setPos(10, yOffset);
+        playerGroup->addToGroup(nameItem);
+
+        // Hiển thị ELO người chơi
+        QString eloInfo = QString::number(player->getElo()) + " pts";
+        QGraphicsTextItem *eloItem = new QGraphicsTextItem(eloInfo, background);
+        eloItem->setFont(QFont("Arial", 14));
+        eloItem->setDefaultTextColor(Qt::white);
+        eloItem->setPos(10, yOffset + 25);
+        playerGroup->addToGroup(eloItem);
+
+        listPlayerScene->addItem(playerGroup);
+
+        // Thêm nút "+" nếu người chơi đang Online
+        if (player->getStatus() == "Online") {
+            Button *addButton = new Button("+");
+            addButton->setRect(230, yOffset + 10, 30, 30);
+            addButton->alignText(230, yOffset + 10);
+            addButton->setObjectName(player->getName());
+            // addButton->setPos(300, yOffset); // Vị trí nút ở bên cạnh thông tin
+            connect(addButton, &Button::clicked, this, [player]() {
+                qDebug() << "Added player:" << player->getName();
+            });
+            listPlayerScene->addItem(addButton);
+        }
+
+        yOffset += 60; // Tăng khoảng cách hiển thị giữa các người chơi
+    }
+
+    // Hiển thị danh sách người chơi trong QGraphicsView
+    QGraphicsView *listPlayerView = new QGraphicsView();
+    listPlayerView->setScene(listPlayerScene);
+    listPlayerView->setFixedSize(300, 300); // Kích thước của view
+    listPlayerView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+    listPlayerView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    listPlayerView->setStyleSheet("background-color: transparent; border: none;");
+    listPlayerView->setFrameStyle(QFrame::NoFrame);
+
+    QGraphicsProxyWidget *proxyWidget = new QGraphicsProxyWidget();
+    proxyWidget->setWidget(listPlayerView);
+    proxyWidget->setPos(750, 250);
+    addToScene(proxyWidget);
+    listG.append(proxyWidget);
+
+    listPlayerView->verticalScrollBar()->setValue(0);
 
     // Nút Start (disabled ban đầu)
     Button *startButton = new Button("Start");
@@ -574,6 +642,12 @@ void Game::displayRoom(const QString &room) {
         qDebug() << "Game started!";
     });
     addToScene(startButton);
+
+    QGraphicsRectItem* lockBackground = new QGraphicsRectItem(350, 450, 300, 100);
+    lockBackground->setBrush(QBrush(Qt::black));
+    lockBackground->setOpacity(0.8);
+    addToScene(lockBackground);
+    listG.append(lockBackground);
 }
 
 void Game::gameOver()
