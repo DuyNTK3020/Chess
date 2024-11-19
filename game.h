@@ -40,6 +40,7 @@ public:
     void displayWaitConnect();
     void displayMenu();
     void displayRoom(const QString &room);
+    void displayProfile();
 
     void gameOver();
     void removeAll();

@@ -456,14 +456,14 @@ void Game::displayMenu() {
 
     QGraphicsTextItem *errorText = new QGraphicsTextItem("");
     errorText->setDefaultTextColor(Qt::red);
-    errorText->setPos(width()/2, 450);
+    errorText->setPos(width()/2, 650);
     addToScene(errorText);
     listG.append(errorText);
 
     // Nút tìm trận
     Button *findMatchButton = new Button("Find Match");
     int btnXPos = width()/2 - findMatchButton->boundingRect().width()/2;
-    int btnYPos = 400;
+    int btnYPos = 300;
     findMatchButton->setPos(btnXPos, btnYPos);
     // Gửi yêu cầu connect với token giả định (có thể thay đổi)
     if (clientManager) {
@@ -504,6 +504,15 @@ void Game::displayMenu() {
             errorText->setPos(width()/2 - errorText->boundingRect().width()/2, 450);
         }
     });
+
+    // Nút quản lý người dùng
+    Button *openProfileButton = new Button("Open Profile");
+    openProfileButton->setPos(btnXPos, btnYPos + 200);
+    connect(openProfileButton, &Button::clicked, this, [=]() {
+        displayProfile();
+    });
+    addToScene(openProfileButton);
+    listG.append(openProfileButton);
 }
 
 void Game::displayRoom(const QString &roomID) {
@@ -642,12 +651,90 @@ void Game::displayRoom(const QString &roomID) {
         qDebug() << "Game started!";
     });
     addToScene(startButton);
+    listG.append(startButton);
+
+    Button *outButton = new Button("Out");
+    outButton->setPos(300, 50);
+    addToScene(outButton);
+    listG.append(outButton);
+    connect(outButton, &Button::clicked, this, &Game::displayMenu);
 
     QGraphicsRectItem* lockBackground = new QGraphicsRectItem(350, 450, 300, 100);
     lockBackground->setBrush(QBrush(Qt::black));
     lockBackground->setOpacity(0.8);
     addToScene(lockBackground);
     listG.append(lockBackground);
+}
+
+void Game::displayProfile()
+{
+    bool isEdit = false;
+    drawChessBoard();
+
+    // Xóa các mục hiện tại
+    clearScene();
+
+    // Tiêu đề
+    QGraphicsTextItem *profileTitle = new QGraphicsTextItem("Profile");
+    QFont profileFont("arial", 40);
+    profileTitle->setFont(profileFont);
+    profileTitle->setPos(width()/2 - profileTitle->boundingRect().width()/2, 100);
+    addToScene(profileTitle);
+    listG.append(profileTitle);
+
+    // Trường nhập tên
+    QLineEdit *nameInput = new QLineEdit();
+    nameInput->setPlaceholderText("Enter your name");
+    nameInput->setFixedWidth(200);
+    QGraphicsProxyWidget *proxyName = gameScene->addWidget(nameInput);
+    proxyName->setPos(width()/2 - nameInput->width()/2, 200);
+    proxyName->setEnabled(isEdit);
+    listG.append(proxyName);
+
+    QLineEdit *eloInput = new QLineEdit();
+    eloInput->setPlaceholderText(QString::number(user->getElo()));
+    eloInput->setFixedWidth(200);
+    QGraphicsProxyWidget *proxyElo = gameScene->addWidget(eloInput);
+    proxyElo->setPos(width()/2 - eloInput->width()/2, 250);
+    proxyName->setEnabled(false);
+    listG.append(proxyElo);
+
+    Button *editButton = new Button("Edit");
+    editButton->setPos(400, 600);
+    connect(editButton, &Button::clicked, this, [=]() {
+        qDebug() << "Game started!";
+        // editButton->text
+        isEdit == !isEdit;
+    });
+    addToScene(editButton);
+    listG.append(editButton);
+
+    // // Trường nhập mật khẩu
+    // QLineEdit *passwordInput = new QLineEdit();
+    // passwordInput->setPlaceholderText("Enter password");
+    // passwordInput->setEchoMode(QLineEdit::Password); // Ẩn mật khẩu
+    // passwordInput->setFixedWidth(200);
+    // QGraphicsProxyWidget *proxyPassword = gameScene->addWidget(passwordInput);
+    // proxyPassword->setPos(width()/2 - passwordInput->width()/2, 300);
+    // listG.append(proxyPassword);
+
+    // // Trường nhập mật khẩu mới
+    // QLineEdit *newPasswordInput = new QLineEdit();
+    // newPasswordInput->setPlaceholderText("Enter new password");
+    // newPasswordInput->setEchoMode(QLineEdit::Password); // Ẩn mật khẩu
+    // newPasswordInput->setFixedWidth(200);
+    // QGraphicsProxyWidget *proxyNewPassword = gameScene->addWidget(newPasswordInput);
+    // proxyNewPassword->setPos(width()/2 - newPasswordInput->width()/2, 300);
+    // listG.append(proxyNewPassword);
+
+    // // Trường xác nhận mật khẩu mới
+    // QLineEdit *confirmNewPasswordInput = new QLineEdit();
+    // confirmNewPasswordInput->setPlaceholderText("Confirm new password");
+    // confirmNewPasswordInput->setEchoMode(QLineEdit::Password); // Ẩn mật khẩu
+    // confirmNewPasswordInput->setFixedWidth(200);
+    // QGraphicsProxyWidget *proxyConfirmNewPassword = gameScene->addWidget(confirmNewPasswordInput);
+    // proxyConfirmNewPassword->setPos(width()/2 - confirmNewPasswordInput->width()/2, 350);
+    // listG.append(proxyConfirmNewPassword);
 }
 
 void Game::gameOver()
