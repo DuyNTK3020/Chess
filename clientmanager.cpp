@@ -47,10 +47,13 @@ void ClientManager::onReadyRead()
         }
         if (jsonObj.contains("type") && jsonObj["type"].toString() == "login_ack") {
             QString status = jsonObj["status"].toString();
+            QString message = jsonObj["message"].toString();
+            QString token = jsonObj["token"].toString();
+
             if (status == "success") {
-                emit loginResult(true);  // Đăng nhập thành công
+                emit loginResult(true, token);  // Đăng nhập thành công
             } else {
-                emit loginResult(false);  // Đăng nhập thất bại
+                emit loginResult(false, "");  // Đăng nhập thất bại
             }
         }
         if (jsonObj.contains("type") && jsonObj["type"].toString() == "connect_ack") {

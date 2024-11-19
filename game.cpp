@@ -263,8 +263,9 @@ void Game::displayLogin() {
             clientManager->sendLoginRequest(username, password);
         }
 
-        connect(clientManager, &ClientManager::loginResult, this, [=](bool success) {
+        connect(clientManager, &ClientManager::loginResult, this, [=](bool success, const QString &token) {
             if (success) {
+                user->setToken(token);
                 displayWaitConnect();
             } else {
                 qDebug() << "login fail!";
@@ -407,15 +408,6 @@ void Game::displayWaitConnect() {
 
     clearScene();
 
-    QGraphicsTextItem *titleText = new QGraphicsTextItem("Menu");
-    QFont titleFont("arial", 50);
-    titleText->setFont(titleFont);
-    int xPos = width()/2 - titleText->boundingRect().width()/2;
-    int yPos = 150;
-    titleText->setPos(xPos, yPos);
-    addToScene(titleText);
-    listG.append(titleText);
-
     QGraphicsTextItem *connectingText = new QGraphicsTextItem("Connecting to server...");
     connectingText->setFont(QFont("arial", 18));
     connectingText->setPos(width() / 2 - connectingText->boundingRect().width()/2, height() / 2 - 50);
@@ -424,8 +416,6 @@ void Game::displayWaitConnect() {
 
     // Gửi yêu cầu connect với token giả định (có thể thay đổi)
     if (clientManager) {
-        // Set sau
-        user->setToken("hihi");
         clientManager->sendConnectRequest(user->getToken());
     }
 

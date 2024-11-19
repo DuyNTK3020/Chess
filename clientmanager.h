@@ -20,7 +20,7 @@ public:
 signals:
     void moveReceived(const QString &moveData);
     void registerResponseReceived(const QString &status, const QString &message);
-    void loginResult(bool success);
+    void loginResult(bool success, const QString &token);
     void connectionResult(const QString &status, const QString &message);
     void findMatchResult(const QString &status, const QString &room, const QString &competitor, const QString &role);
     void createRoomResult(const QString &status, const QString &room);
