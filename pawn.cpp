@@ -27,7 +27,14 @@ void Pawn::moves()
     int row = this->getCurrentBox()->rowLoc;
 
     int col = this->getCurrentBox()->colLoc;
-    if(this->getSide() == "WHITE")  {
+
+
+    if(firstMove){
+        firstrow = this->getCurrentBox()->rowLoc;
+
+    }
+
+    if(this->getSide() == "WHITE" && firstrow > 5)  {
         if(col > 0 && row > 0 && game->collection[row-1][col-1]->getChessPieceColor() == "BLACK") {
             location.append(game->collection[row-1][col-1]);
             boxSetting(location.last());
@@ -46,7 +53,48 @@ void Pawn::moves()
         }
 
     }
-    else{
+    if(this->getSide() == "WHITE" && firstrow < 2)  {
+        if(col > 0 && row < 7 && game->collection[row+1][col-1]->getChessPieceColor() == "BLACK") {//left
+            location.append(game->collection[row+1][col-1]);
+            boxSetting(location.last());
+        }
+        if(col < 7 && row <  7 && game->collection[row+1][col+1]->getChessPieceColor() == "BLACK") {//right
+            location.append(game->collection[row+1][col+1]);
+            boxSetting(location.last());
+        }
+        if(row<7 && (!game->collection[row+1][col]->getHasChessPiece())) {
+            location.append(game->collection[row+1][col]);
+            boxSetting(location.last());
+            if(firstMove && !game->collection[row+2][col]->getHasChessPiece()){
+                location.append(game->collection[row+2][col]);
+                boxSetting(location.last());
+            }
+
+        }
+
+
+    }
+    if(this->getSide() == "BLACK" && firstrow > 5)  {
+        if(col > 0 && row > 0 && game->collection[row-1][col-1]->getChessPieceColor() == "WHITE") {
+            location.append(game->collection[row-1][col-1]);
+            boxSetting(location.last());
+        }
+        if(col < 7 && row > 0 && game->collection[row-1][col+1]->getChessPieceColor() == "WHITE") {
+            location.append(game->collection[row-1][col+1]);
+            boxSetting(location.last());
+        }
+        if(row>0 && (!game->collection[row-1][col]->getHasChessPiece())) {
+            location.append(game->collection[row-1][col]);
+            boxSetting(location.last());
+            if(firstMove && !game->collection[row-2][col]->getHasChessPiece()){
+                location.append(game->collection[row-2][col]);
+                boxSetting(location.last());
+            }
+        }
+
+    }
+
+    if(this->getSide() == "BLACK" && firstrow < 2)  {
         if(col > 0 && row < 7 && game->collection[row+1][col-1]->getChessPieceColor() == "WHITE") {//left
             location.append(game->collection[row+1][col-1]);
             boxSetting(location.last());
@@ -64,6 +112,7 @@ void Pawn::moves()
             }
 
         }
+
 
     }
 

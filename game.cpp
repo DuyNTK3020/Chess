@@ -54,9 +54,9 @@ Game::Game(QWidget *parent ):QGraphicsView(parent)
 
 }
 
-void Game::drawChessBoard()
+void Game::drawChessBoard(QString role)
 {
-    chess = new ChessBoard();
+    chess = new ChessBoard(role);
     drawDeadHolder(0,0,Qt::lightGray);    // Khu vực chứa quân cờ trắng đã chết
     drawDeadHolder(1100,0,Qt::lightGray); // Khu vực chứa quân cờ đen đã chết
     chess->drawBoxes(width()/2-400,50);   // Vẽ bàn cờ ở vị trí trung tâm
@@ -167,7 +167,7 @@ void Game::start(const QString &status, const QString &room, const QString &comp
     blackPiece->setPlainText("BLACK PIECE");
     addToScene(blackPiece);
     addToScene(check); // Thêm thông báo "CHECK"
-    chess->addChessPiece(); // Thêm các quân cờ vào bàn cờ
+    chess->addChessPiece(role); // Thêm các quân cờ vào bàn cờ
 }
 
 void Game::drawDeadHolder(int x, int y,QColor color)
@@ -280,6 +280,8 @@ void Game::displayLogin() {
     connect(registerButton, &Button::clicked, this, &Game::displayRegister);
     addToScene(registerButton);
     listG.append(registerButton);
+
+    drawChessBoard("WHITE");
 }
 
 void Game::displayRegister() {

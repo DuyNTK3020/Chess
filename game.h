@@ -13,7 +13,7 @@ public:
 
     //public Methods
     void drawDeadHolder(int x, int y, QColor color);
-    void drawChessBoard();
+    void drawChessBoard(QString role);
     void displayDeadWhite();
     void displayDeadBlack();
     void placeInDeadPlace(ChessPiece *piece);

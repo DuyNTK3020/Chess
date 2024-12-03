@@ -8,10 +8,15 @@
 #include "knight.h"
 #include "bishop.h"
 extern Game *game;
-ChessBoard::ChessBoard()
+ChessBoard::ChessBoard(QString role)
 {
-    setUpBlack();
-    setUpWhite();
+    if (role == "WHITE") {
+        setUpWhite2();
+        setUpBlack2();
+    } else if (role == "BLACK") {
+        setUpBlack();
+        setUpWhite();
+    }
 }
 void ChessBoard::drawBoxes(int x,int y)
 {
@@ -38,28 +43,60 @@ void ChessBoard::drawBoxes(int x,int y)
 }
 
 
-void ChessBoard::addChessPiece() {
-    for(int i = 0; i < 8; i++) {
-        for(int j = 0; j < 8; j++)
-        {
+void ChessBoard::addChessPiece(QString role) {
 
-            ChessBox *box =game->collection[i][j];
-            if(i < 2) {
-                static int k;
-                box->placePiece(black[k]);
-                game->alivePiece.append(black[k]);
-                game->addToScene(black[k++]);
-            }
-            if(i > 5) {
-                static int h;
-                box->placePiece(white[h]);
-                game->alivePiece.append(white[h]);
-                game->addToScene(white[h++]);
-            }
+    if (role == "WHITE") {
+        for(int i = 0; i < 8; i++) {
+            for(int j = 0; j < 8; j++)
+            {
 
+                ChessBox *box =game->collection[i][j];
+                if(i < 2) {
+                    static int k;
+                    box->placePiece(white[k]);
+                    game->alivePiece.append(white[k]);
+                    game->addToScene(white[k++]);
+                }
+                if(i > 5) {
+                    static int h;
+                    box->placePiece(black[h]);
+                    game->alivePiece.append(black[h]);
+                    game->addToScene(black[h++]);
+                }
+
+            }
+        }
+    } else if (role == "BLACK") {
+        for(int i = 0; i < 8; i++) {
+            for(int j = 0; j < 8; j++)
+            {
+
+                ChessBox *box =game->collection[i][j];
+                if(i < 2) {
+                    static int k;
+                    box->placePiece(black[k]);
+                    game->alivePiece.append(black[k]);
+                    game->addToScene(black[k++]);
+                }
+                if(i > 5) {
+                    static int h;
+                    box->placePiece(white[h]);
+                    game->alivePiece.append(white[h]);
+                    game->addToScene(white[h++]);
+                }
+
+            }
         }
     }
+
+
+
 }
+
+
+
+
+
 
 void ChessBoard::setUpWhite()
 {
@@ -87,6 +124,31 @@ void ChessBoard::setUpWhite()
 
 }
 
+void ChessBoard::setUpWhite2()
+{
+    ChessPiece *piece;
+    piece = new Rook("WHITE");
+    white.append(piece);
+    piece = new Knight("WHITE");
+    white.append(piece);
+    piece = new Bishop("WHITE");
+    white.append(piece);
+    piece = new Queen("WHITE");
+    white.append(piece);
+    piece = new King("WHITE");
+    white.append(piece);
+    piece = new Bishop("WHITE");
+    white.append(piece);
+    piece = new Knight("WHITE");
+    white.append(piece);
+    piece = new Rook("WHITE");
+    white.append(piece);
+    for(int i = 0; i < 8; i++) {
+        piece = new Pawn("WHITE");
+        white.append(piece);
+    }
+}
+
 void ChessBoard::setUpBlack()
 {
     ChessPiece *piece;
@@ -110,6 +172,33 @@ void ChessBoard::setUpBlack()
         piece = new Pawn("BLACK");
         black.append(piece);
     }
+}
+
+
+void ChessBoard::setUpBlack2()
+{
+    ChessPiece *piece;
+    for(int i = 0; i < 8; i++) {
+        piece = new Pawn("BLACK");
+        black.append(piece);
+    }
+    piece = new Rook("BLACK");
+    black.append(piece);
+    piece = new Knight("BLACK");
+    black.append(piece);
+    piece = new Bishop("BLACK");
+    black.append(piece);
+    piece = new Queen("BLACK");
+    black.append(piece);
+    piece = new King("BLACK");
+    black.append(piece);
+    piece = new Bishop("BLACK");
+    black.append(piece);
+    piece = new Knight("BLACK");
+    black.append(piece);
+    piece = new Rook("BLACK");
+    black.append(piece);
+
 }
 
 
