@@ -5,7 +5,7 @@
 class ChessBoard
 {
 public:
-    ChessBoard();
+    ChessBoard(QString role);
 
     //drawing public function
     void drawBoxes(int x, int y);
@@ -13,9 +13,11 @@ public:
     void setUpWhite();
     void setUpBlack();
 
+    void setUpWhite2();
+    void setUpBlack2();
 
-
-    void addChessPiece();
+    void addChessPiece(QString role);
+    void addChessPiece2();
     void reset();
 private:
     QList <ChessPiece *> white;

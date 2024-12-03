@@ -13,7 +13,7 @@ public:
 
     //public Methods
     void drawDeadHolder(int x, int y, QColor color);
-    void drawChessBoard();
+    void drawChessBoard(QString role);
     void displayDeadWhite();
     void displayDeadBlack();
     void placeInDeadPlace(ChessPiece *piece);
@@ -41,7 +41,7 @@ public:
     void gameOver();
     void removeAll();
 public slots:
-    void start();
+    void start(QString role);
 private:
     QGraphicsScene *gameScene;
     QList <ChessPiece *> whiteDead;

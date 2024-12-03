@@ -10,7 +10,7 @@ public:
     void moves();
 
  private:
-
+int firstrow;
 
 };
 

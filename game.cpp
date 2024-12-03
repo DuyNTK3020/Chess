@@ -46,9 +46,9 @@ Game::Game(QWidget *parent ):QGraphicsView(parent)
 
 }
 
-void Game::drawChessBoard()
+void Game::drawChessBoard(QString role)
 {
-    chess = new ChessBoard();
+    chess = new ChessBoard(role);
     drawDeadHolder(0,0,Qt::lightGray);    // Khu vực chứa quân cờ trắng đã chết
     drawDeadHolder(1100,0,Qt::lightGray); // Khu vực chứa quân cờ đen đã chết
     chess->drawBoxes(width()/2-400,50);   // Vẽ bàn cờ ở vị trí trung tâm
@@ -137,7 +137,7 @@ void Game::changeTurn()
     turnDisplay->setPlainText("Turn : " + getTurn()); // Cập nhật hiển thị lượt
 }
 
-void Game::start()
+void Game::start(QString role)
 {
     for(size_t i =0, n = listG.size(); i < n; i++)
         removeFromScene(listG[i]); // Xóa các đối tượng khỏi Scene
@@ -159,7 +159,7 @@ void Game::start()
     blackPiece->setPlainText("BLACK PIECE");
     addToScene(blackPiece);
     addToScene(check); // Thêm thông báo "CHECK"
-    chess->addChessPiece(); // Thêm các quân cờ vào bàn cờ
+    chess->addChessPiece(role); // Thêm các quân cờ vào bàn cờ
 }
 
 void Game::drawDeadHolder(int x, int y,QColor color)
@@ -242,7 +242,7 @@ void Game::displayLogin() {
 
         connect(clientManager, &ClientManager::loginResult, this, [=](bool success) {
             if (success) {
-                start();  // Bắt đầu trò chơi nếu đăng nhập thành công
+                start("WHITE");  // Bắt đầu trò chơi nếu đăng nhập thành công
             } else {
                 qDebug() << "Invalid credentials!";
                 // Thêm thông báo lỗi cho người dùng ở đây
@@ -259,7 +259,7 @@ void Game::displayLogin() {
     addToScene(registerButton);
     listG.append(registerButton);
 
-    drawChessBoard();
+    drawChessBoard("WHITE");
 }
 
 void Game::displayRegister() {
