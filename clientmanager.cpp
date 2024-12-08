@@ -42,16 +42,17 @@ void ClientManager::onReadyRead()
         if (jsonObj.contains("type") && jsonObj["type"].toString() == "register_ack") {
             QString status = jsonObj["status"].toString();
             QString message = jsonObj["message"].toString();
-            qDebug() << "Connection " << status << ": " << message;
-            emit registerResponseReceived(status, message);
+            qDebug() << "Register " << status << ": " << message;
+            emit registerResult(status, message);
         }
         if (jsonObj.contains("type") && jsonObj["type"].toString() == "login_ack") {
             QString status = jsonObj["status"].toString();
-            if (status == "success") {
-                emit loginResult(true);  // Đăng nhập thành công
-            } else {
-                emit loginResult(false);  // Đăng nhập thất bại
-            }
+            QString message = jsonObj["message"].toString();
+            QString name = jsonObj["name"].toString();
+            int elo = jsonObj["elo"].toInt();
+            QString token = jsonObj["token"].toString();
+            qDebug() << "Login " << status << ": " << message;
+            emit loginResult(status, message, name, elo, token);  // Đăng nhập thành công
         }
         if (jsonObj.contains("type") && jsonObj["type"].toString() == "connect_ack") {
             QString status = jsonObj["status"].toString();

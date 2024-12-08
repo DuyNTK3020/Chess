@@ -18,6 +18,7 @@ public:
     void hoverEnterEvent(QGraphicsSceneHoverEvent *event);
     void hoverLeaveEvent(QGraphicsSceneHoverEvent *event);
     void setSize(int width, int height);
+    void setText(const QString &newText);
     void alignText(int x, int y);
 signals:
     void clicked();

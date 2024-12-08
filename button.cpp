@@ -56,3 +56,10 @@ void Button::alignText(int x, int y)
     int yPos = rect().height() / 2 - text->boundingRect().height() / 2 + y;
     text->setPos(xPos, yPos);
 }
+
+void Button::setText(const QString &newText) {
+    text->setPlainText(newText);
+    int xPos = rect().width() / 2 - text->boundingRect().width() / 2;
+    int yPos = rect().height() / 2 - text->boundingRect().height() / 2;
+    text->setPos(xPos, yPos);
+}

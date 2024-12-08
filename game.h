@@ -12,6 +12,7 @@ public:
     Game(QWidget *parent = 0);
 
     //public Methods
+    void setBackground();
     void drawDeadHolder(int x, int y, QColor color);
     void drawChessBoard(QString role);
     void displayDeadWhite();
@@ -48,6 +49,7 @@ public:
 public slots:
     void start(const QString &status, const QString &room, const QString &competitor, const QString &role);
 private:
+    QGraphicsPixmapItem* background = nullptr;
     QGraphicsScene *gameScene;
     QList <ChessPiece *> whiteDead;
     QList <ChessPiece *> blackDead;

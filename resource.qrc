@@ -12,5 +12,7 @@
         <file>queen1.png</file>
         <file>rook.png</file>
         <file>rook1.png</file>
+        <file>background.jpg</file>
     </qresource>
+    <qresource prefix="/"/>
 </RCC>
