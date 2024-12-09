@@ -16,6 +16,8 @@ public:
     void sendConnectRequest(const QString &token);
     void sendFindMatchRequest(const QString &username);
     void sendCreateRoomRequest(const QString &username);
+    void sendUpdateProfileRequest(const QString &username, const QString &name);
+    void sendChangePasswordRequest(const QString &username, const QString &password);
 
 signals:
     void moveReceived(const QString &moveData);

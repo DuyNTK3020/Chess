@@ -179,3 +179,39 @@ void ClientManager::sendCreateRoomRequest(const QString &username)
         qDebug() << "Socket not writable!";
     }
 }
+
+void ClientManager::sendUpdateProfileRequest(const QString &username, const QString &name) {
+    QJsonObject json;
+    json["type"] = "update_profile";
+    json["username"] = username;
+    json["name"] = name;
+
+    QJsonDocument doc(json);
+    QByteArray data = doc.toJson(QJsonDocument::Compact);
+
+    if (socket && socket->isWritable()) {
+        socket->write(data);
+        socket->flush();
+        qDebug() << "Sent connect request:" << data;
+    } else {
+        qDebug() << "Socket not writable!";
+    }
+}
+
+void ClientManager::sendChangePasswordRequest(const QString &username, const QString &password) {
+    QJsonObject json;
+    json["type"] = "update_profile";
+    json["username"] = username;
+    json["password"] = password;
+
+    QJsonDocument doc(json);
+    QByteArray data = doc.toJson(QJsonDocument::Compact);
+
+    if (socket && socket->isWritable()) {
+        socket->write(data);
+        socket->flush();
+        qDebug() << "Sent connect request:" << data;
+    } else {
+        qDebug() << "Socket not writable!";
+    }
+}

@@ -498,6 +498,12 @@ void Game::displayMenu() {
     int btnYPos = 300;
     findMatchButton->setPos(btnXPos, btnYPos);
 
+    connect(findMatchButton, &Button::clicked, this, [=]() {
+        if (clientManager) {
+            clientManager->sendFindMatchRequest(user->getUsername());
+        }
+    });
+
     // Kết nối tín hiệu từ ClientManager
     connect(clientManager, &ClientManager::findMatchResult, this, [=](const QString &status, const QString &room, const QString &competitor, const QString &role) {
         if (status == "success") {
@@ -786,6 +792,9 @@ void Game::displayProfile()
         if (isEdit) {
             editButton->setText("Save");
         } else {
+            if (clientManager) {
+                clientManager->sendUpdateProfileRequest(user->getUsername(), nameInput->text());
+            }
             editButton->setText("Edit");
         }
     });
@@ -795,6 +804,10 @@ void Game::displayProfile()
     Button *changePasswordButton = new Button("Change Password");
     changePasswordButton->setPos(600, 700);
     connect(changePasswordButton, &Button::clicked, this, [=]() mutable {
+        if (isChangePassword && passwordInput->text() != newPasswordInput->text()) {
+            qDebug() << "mat khau khong trung khop";
+            return;
+        }
         isChangePassword = !isChangePassword;
         qDebug() << "isChangePassword:" << isChangePassword;
 
@@ -804,6 +817,9 @@ void Game::displayProfile()
             proxyNewPassword->show();
             newPasswordTitle->show();
         } else {
+            if (clientManager) {
+                clientManager->sendChangePasswordRequest(user->getUsername(), newPasswordInput->text());
+            }
             changePasswordButton->setText("Change Password");
             proxyNewPassword->hide();
             newPasswordTitle->hide();
