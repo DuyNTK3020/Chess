@@ -15,6 +15,9 @@
 #include <QGraphicsProxyWidget>
 #include <QScrollBar>
 
+
+QString Game::role = ""; // Khởi tạo giá trị mặc định
+
 Game::Game(QWidget *parent ):QGraphicsView(parent)
 {
     // Tạo Scene cho game
@@ -171,6 +174,7 @@ void Game::start(const QString &status, const QString &room, const QString &comp
 {
     // Xóa các đối tượng khỏi Scene
     clearScene();
+    Game::role = role; // Gán giá trị mới cho biến static
 
     addToScene(turnDisplay);
     QGraphicsTextItem* whitePiece = new QGraphicsTextItem();
@@ -290,7 +294,8 @@ void Game::displayLogin() {
                 user->setName(name);
                 user->setToken(token);
                 user->setElo(elo);
-                displayWaitConnect();
+                //displayWaitConnect();
+                start("","","","WHITE");
 
             } else if (status == "failure") {
                 errorText->setPlainText(message);
@@ -308,7 +313,7 @@ void Game::displayLogin() {
     addToScene(registerButton);
     listG.append(registerButton);
 
-    // drawChessBoard("WHITE");
+     drawChessBoard("WHITE");
 }
 
 void Game::displayRegister() {
