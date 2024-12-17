@@ -434,11 +434,10 @@ void Game::displayRegister() {
 
 
 void Game::displayWaitConnect() {
-    drawChessBoard("WHITE");
 
     clearScene();
 
-    QGraphicsTextItem *titleText = new QGraphicsTextItem("Menu");
+    QGraphicsTextItem *titleText = new QGraphicsTextItem("WaitConnect");
     QFont titleFont("arial", 50);
     titleText->setFont(titleFont);
     int xPos = width()/2 - titleText->boundingRect().width()/2;
@@ -468,8 +467,7 @@ void Game::displayWaitConnect() {
             Button *loginButton = new Button("Back to Login");
             loginButton->setPos(width()/2 - loginButton->boundingRect().width()/2, 500);
             connect(loginButton, &Button::clicked, this, [=]() {
-                // Hiển thị thông báo và chuyển về màn hình login
-                displayLogin();  // Quay lại màn hình login sau khi đăng ký thành công
+                displayLogin();
             });
             addToScene(loginButton);
             listG.append(loginButton);
@@ -478,8 +476,6 @@ void Game::displayWaitConnect() {
 }
 
 void Game::displayMenu() {
-    drawChessBoard("WHITE");
-
     clearScene();
 
     QGraphicsTextItem *titleText = new QGraphicsTextItem("Chess Pro");
