@@ -294,8 +294,8 @@ void Game::displayLogin() {
                 user->setName(name);
                 user->setToken(token);
                 user->setElo(elo);
-                //displayWaitConnect();
-                start("","","","WHITE");
+                displayWaitConnect();
+                // start("","","","WHITE");
 
             } else if (status == "failure") {
                 errorText->setPlainText(message);
