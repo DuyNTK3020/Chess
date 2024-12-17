@@ -701,13 +701,12 @@ void Game::displayRoom(const QString &roomID) {
 
 void Game::displayProfile()
 {
-    user->setUsername("duy");
-    user->setName("Nguyen Trong Khanh Duy");
-    user->setElo(2000);
-    user->setPassword("123");
+    // user->setUsername("duy");
+    // user->setName("Nguyen Trong Khanh Duy");
+    // user->setElo(2000);
+    // user->setPassword("123");
     bool isEdit = false;
     bool isChangePassword = false;
-    drawChessBoard("WHITE");
 
     // Xóa các mục hiện tại
     clearScene();
