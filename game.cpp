@@ -313,7 +313,7 @@ void Game::displayLogin() {
     addToScene(registerButton);
     listG.append(registerButton);
 
-     drawChessBoard("WHITE");
+     // drawChessBoard("WHITE");
 }
 
 void Game::displayRegister() {
