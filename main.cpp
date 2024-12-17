@@ -43,8 +43,8 @@ int main(int argc, char *argv[])
     // Khởi tạo game
     game = new Game();
     game->show();
-    // game->displayLogin();
-    game->displayProfile();
+    game->displayLogin();
+    // game->displayProfile();
 
     return a.exec();
 }
