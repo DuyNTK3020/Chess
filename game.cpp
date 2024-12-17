@@ -699,12 +699,11 @@ void Game::displayRoom(const QString &roomID) {
     listG.append(lockBackground);
 }
 
+extern ClientManager *clientManager;
+extern User *user;
+extern QList<Player*> players;
 void Game::displayProfile()
 {
-    // user->setUsername("duy");
-    // user->setName("Nguyen Trong Khanh Duy");
-    // user->setElo(2000);
-    // user->setPassword("123");
     bool isEdit = false;
     bool isChangePassword = false;
 
