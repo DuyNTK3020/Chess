@@ -321,8 +321,6 @@ void Game::displayLogin() {
 }
 
 void Game::displayRegister() {
-    drawChessBoard("WHITE");
-
     // Xóa các mục hiện tại
     clearScene();
 

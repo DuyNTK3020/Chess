@@ -200,7 +200,7 @@ void ClientManager::sendUpdateProfileRequest(const QString &username, const QStr
 
 void ClientManager::sendChangePasswordRequest(const QString &username, const QString &password) {
     QJsonObject json;
-    json["type"] = "update_profile";
+    json["type"] = "change_password";
     json["username"] = username;
     json["password"] = password;
 
