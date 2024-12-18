@@ -172,6 +172,9 @@ void Game::changeTurn()
 
 void Game::start(const QString &status, const QString &room, const QString &competitor, const QString &role)
 {
+    // drawChessBoard("WHITE");
+    drawChessBoard(role);
+
     // Xóa các đối tượng khỏi Scene
     clearScene();
     Game::role = role; // Gán giá trị mới cho biến static
