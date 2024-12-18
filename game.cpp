@@ -291,9 +291,13 @@ void Game::displayLogin() {
         connect(clientManager, &ClientManager::loginResult, this, [=](const QString &status, const QString &message, const QString &name, int elo, const QString &token) {
             if (status == "success") {
                 // Giải mã token để lấy username
+                user->setUsername(username);
+                user->setPassword(password);
                 user->setName(name);
                 user->setToken(token);
                 user->setElo(elo);
+                qDebug() << user->getName();
+                qDebug() << user->getElo();
                 displayWaitConnect();
                 // start("","","","WHITE");
 
@@ -317,8 +321,6 @@ void Game::displayLogin() {
 }
 
 void Game::displayRegister() {
-    drawChessBoard("WHITE");
-
     // Xóa các mục hiện tại
     clearScene();
 
@@ -432,13 +434,14 @@ void Game::displayRegister() {
     });
 }
 
-
+extern ClientManager *clientManager;
+extern User *user;
+extern QList<Player*> players;
 void Game::displayWaitConnect() {
-    drawChessBoard("WHITE");
 
     clearScene();
 
-    QGraphicsTextItem *titleText = new QGraphicsTextItem("Menu");
+    QGraphicsTextItem *titleText = new QGraphicsTextItem("WaitConnect");
     QFont titleFont("arial", 50);
     titleText->setFont(titleFont);
     int xPos = width()/2 - titleText->boundingRect().width()/2;
@@ -468,8 +471,7 @@ void Game::displayWaitConnect() {
             Button *loginButton = new Button("Back to Login");
             loginButton->setPos(width()/2 - loginButton->boundingRect().width()/2, 500);
             connect(loginButton, &Button::clicked, this, [=]() {
-                // Hiển thị thông báo và chuyển về màn hình login
-                displayLogin();  // Quay lại màn hình login sau khi đăng ký thành công
+                displayLogin();
             });
             addToScene(loginButton);
             listG.append(loginButton);
@@ -478,8 +480,6 @@ void Game::displayWaitConnect() {
 }
 
 void Game::displayMenu() {
-    drawChessBoard("WHITE");
-
     clearScene();
 
     QGraphicsTextItem *titleText = new QGraphicsTextItem("Chess Pro");
@@ -703,15 +703,13 @@ void Game::displayRoom(const QString &roomID) {
     listG.append(lockBackground);
 }
 
+extern ClientManager *clientManager;
+extern User *user;
+extern QList<Player*> players;
 void Game::displayProfile()
 {
-    user->setUsername("duy");
-    user->setName("Nguyen Trong Khanh Duy");
-    user->setElo(2000);
-    user->setPassword("123");
     bool isEdit = false;
     bool isChangePassword = false;
-    drawChessBoard("WHITE");
 
     // Xóa các mục hiện tại
     clearScene();
@@ -751,6 +749,8 @@ void Game::displayProfile()
     addToScene(newPasswordTitle);
     listG.append(newPasswordTitle);
 
+    qDebug()<<user;
+
     QLineEdit *nameInput = new QLineEdit();
     nameInput->setText(user->getName());
     nameInput->setPlaceholderText("Enter your name");
@@ -761,6 +761,7 @@ void Game::displayProfile()
     listG.append(proxyName);
 
     QLineEdit *eloInput = new QLineEdit();
+    qDebug() << user->getElo();
     eloInput->setText(QString::number(user->getElo()));
     eloInput->setFixedWidth(250);
     QGraphicsProxyWidget *proxyElo = gameScene->addWidget(eloInput);
