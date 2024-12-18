@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
     game = new Game();
     game->show();
      game->displayLogin();
-    //game->displayProfile();
+    // game->displayProfile();
 
     return a.exec();
 }

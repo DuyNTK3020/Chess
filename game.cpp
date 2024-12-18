@@ -553,8 +553,6 @@ void Game::displayMenu() {
 }
 
 void Game::displayRoom(const QString &roomID) {
-    drawChessBoard("WHITE");
-
     clearScene();
 
     QGraphicsTextItem *titleText = new QGraphicsTextItem("Room: " + roomID);
@@ -790,6 +788,10 @@ void Game::displayProfile()
 
     Button *editButton = new Button("Edit");
     editButton->setPos(600, 600);
+
+    Button *changePasswordButton = new Button("Change Password");
+    changePasswordButton->setPos(600, 700);
+
     connect(editButton, &Button::clicked, this, [=]() mutable {
         isEdit = !isEdit;
         qDebug() << "isEdit:" << isEdit;
@@ -797,18 +799,18 @@ void Game::displayProfile()
         proxyName->setEnabled(isEdit);
         if (isEdit) {
             editButton->setText("Save");
+            changePasswordButton->hide();
         } else {
             if (clientManager) {
                 clientManager->sendUpdateProfileRequest(user->getUsername(), nameInput->text());
             }
             editButton->setText("Edit");
+            changePasswordButton->show();
         }
     });
     addToScene(editButton);
     listG.append(editButton);
 
-    Button *changePasswordButton = new Button("Change Password");
-    changePasswordButton->setPos(600, 700);
     connect(changePasswordButton, &Button::clicked, this, [=]() mutable {
         if (isChangePassword && passwordInput->text() != newPasswordInput->text()) {
             qDebug() << "mat khau khong trung khop";
@@ -820,6 +822,7 @@ void Game::displayProfile()
         proxyPassword->setEnabled(isChangePassword);
         if (isChangePassword) {
             changePasswordButton->setText("Save");
+            editButton->hide();
             proxyNewPassword->show();
             newPasswordTitle->show();
         } else {
@@ -827,6 +830,7 @@ void Game::displayProfile()
                 clientManager->sendChangePasswordRequest(user->getUsername(), newPasswordInput->text());
             }
             changePasswordButton->setText("Change Password");
+            editButton->show();
             proxyNewPassword->hide();
             newPasswordTitle->hide();
         }
