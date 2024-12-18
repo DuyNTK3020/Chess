@@ -291,6 +291,8 @@ void Game::displayLogin() {
         connect(clientManager, &ClientManager::loginResult, this, [=](const QString &status, const QString &message, const QString &name, int elo, const QString &token) {
             if (status == "success") {
                 // Giải mã token để lấy username
+                user->setUsername(username);
+                user->setPassword(password);
                 user->setName(name);
                 user->setToken(token);
                 user->setElo(elo);
