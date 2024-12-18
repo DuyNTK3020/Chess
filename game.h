@@ -46,12 +46,8 @@ public:
     void gameOver();
     void removeAll();
     void clearScene();
-    static QString role;
-
-
 public slots:
     void start(const QString &status, const QString &room, const QString &competitor, const QString &role);
-
 private:
     QGraphicsPixmapItem* background = nullptr;
     QGraphicsScene *gameScene;
