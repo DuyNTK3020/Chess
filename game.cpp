@@ -883,3 +883,31 @@ void Game::clearScene() {
     }
     listG.clear();
 }
+
+void moveChessPiece(int oldCol, int oldRow, int newCol, int newRow) {
+    // Lấy ô cũ và ô mới
+    ChessBox *oldBox = game->board[oldRow][oldCol];
+    ChessBox *newBox = game->board[newRow][newCol];
+
+    // Lấy quân cờ từ ô cũ
+    ChessPiece *piece = oldBox->currentPiece;
+
+    if (!piece) {
+        qDebug() << "Không có quân cờ ở vị trí (" << oldCol << ", " << oldRow << ")";
+        return;
+    }
+
+    // Cập nhật trạng thái ô cũ
+    oldBox->setHasChessPiece(false);
+    oldBox->currentPiece = nullptr;
+
+    // Cập nhật trạng thái ô mới
+    newBox->setHasChessPiece(true);
+    newBox->currentPiece = piece;
+
+    // Cập nhật vị trí của quân cờ
+    piece->setCurrentBox(newBox);
+
+    qDebug() << "Di chuyển quân cờ từ (" << oldCol << ", " << oldRow
+             << ") đến (" << newCol << ", " << newRow << ")";
+}
