@@ -24,8 +24,8 @@ signals:
     void registerResult(const QString &status, const QString &message);
     void loginResult(const QString &status, const QString &message, const QString &name, int elo, const QString &token);
     void connectionResult(const QString &status, const QString &message);
-    void findMatchResult(const QString &status, const QString &room, const QString &competitor, const QString &role);
-    void createRoomResult(const QString &status, const QString &room);
+    void findMatchResult(const QString &status, const QString &message, const QString &opponent, const QString &match_id, const QString &role);
+    void createRoomResult(const QString &status, const QString &message);
 private slots:
     void onReadyRead();
 

@@ -40,14 +40,15 @@ public:
     void displayRegister();
     void displayWaitConnect();
     void displayMenu();
-    void displayRoom(const QString &room);
+    void displayWaitFindMatch();
+    void displayRoom();
     void displayProfile();
 
     void gameOver();
     void removeAll();
     void clearScene();
 public slots:
-    void start(const QString &status, const QString &room, const QString &competitor, const QString &role);
+    void start(const QString &status, const QString &match_id, const QString &opponent, const QString &role);
 private:
     QGraphicsPixmapItem* background = nullptr;
     QGraphicsScene *gameScene;

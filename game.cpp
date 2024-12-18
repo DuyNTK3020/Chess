@@ -167,7 +167,7 @@ void Game::changeTurn()
     turnDisplay->setPlainText("Turn : " + getTurn()); // Cập nhật hiển thị lượt
 }
 
-void Game::start(const QString &status, const QString &room, const QString &competitor, const QString &role)
+void Game::start(const QString &status, const QString &match_id, const QString &opponent, const QString &role)
 {
     // drawChessBoard("WHITE");
     drawChessBoard(role);
@@ -500,21 +500,9 @@ void Game::displayMenu() {
     findMatchButton->setPos(btnXPos, btnYPos);
 
     connect(findMatchButton, &Button::clicked, this, [=]() {
-        if (clientManager) {
-            clientManager->sendFindMatchRequest(user->getUsername());
-        }
+        displayWaitFindMatch();
     });
 
-    // Kết nối tín hiệu từ ClientManager
-    connect(clientManager, &ClientManager::findMatchResult, this, [=](const QString &status, const QString &room, const QString &competitor, const QString &role) {
-        if (status == "success") {
-            start(status, room, competitor, role);
-        } else if (status == "failure") {
-            errorText->setPlainText("Error: Cannot find a match.");
-            errorText->setPos(width()/2 - errorText->boundingRect().width()/2, 450);
-            return;
-        }
-    });
     addToScene(findMatchButton);
     listG.append(findMatchButton);
 
@@ -529,15 +517,6 @@ void Game::displayMenu() {
     addToScene(createRoomButton);
     listG.append(createRoomButton);
 
-    connect(clientManager, &ClientManager::findMatchResult, this, [=](const QString &status, const QString &room) {
-        if (status == "success") {
-            displayRoom(room);
-        } else if (status == "failure") {
-            errorText->setPlainText("Error: Cannot create a room.");
-            errorText->setPos(width()/2 - errorText->boundingRect().width()/2, 450);
-        }
-    });
-
     // Nút quản lý người dùng
     Button *openProfileButton = new Button("Open Profile");
     openProfileButton->setPos(btnXPos, btnYPos + 200);
@@ -548,10 +527,51 @@ void Game::displayMenu() {
     listG.append(openProfileButton);
 }
 
-void Game::displayRoom(const QString &roomID) {
+void Game::displayWaitFindMatch() {
     clearScene();
 
-    QGraphicsTextItem *titleText = new QGraphicsTextItem("Room: " + roomID);
+    QGraphicsTextItem *titleText = new QGraphicsTextItem("Wait find match");
+    QFont titleFont("arial", 50);
+    titleText->setFont(titleFont);
+    int xPos = width()/2 - titleText->boundingRect().width()/2;
+    int yPos = 150;
+    titleText->setPos(xPos, yPos);
+    addToScene(titleText);
+    listG.append(titleText);
+
+    QGraphicsTextItem *errorText = new QGraphicsTextItem("");
+    errorText->setDefaultTextColor(Qt::red);
+    addToScene(errorText);
+    listG.append(errorText);
+
+    // Gửi yêu cầu connect với token giả định (có thể thay đổi)
+    if (clientManager) {
+        clientManager->sendFindMatchRequest(user->getUsername());
+    }
+
+    // Kết nối tín hiệu từ ClientManager
+    connect(clientManager, &ClientManager::findMatchResult, this, [=](const QString &status, const QString &message, const QString &opponent, const QString &match_id, const QString &role) {
+        if (status == "success") {
+            start(status,match_id,opponent,role);
+        } else if (status == "failure") {
+            errorText->setPlainText(message);
+            errorText->setPos(width()/2 - errorText->boundingRect().width()/2, 450);
+
+            Button *menuButton = new Button("Back to Menu");
+            menuButton->setPos(width()/2 - menuButton->boundingRect().width()/2, 500);
+            connect(menuButton, &Button::clicked, this, [=]() {
+                displayMenu();
+            });
+            addToScene(menuButton);
+            listG.append(menuButton);
+        }
+    });
+}
+
+void Game::displayRoom() {
+    clearScene();
+
+    QGraphicsTextItem *titleText = new QGraphicsTextItem("Room");
     QFont titleFont("arial", 50);
     titleText->setFont(titleFont);
     int xPos = width()/2 - titleText->boundingRect().width()/2;

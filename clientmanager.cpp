@@ -62,24 +62,21 @@ void ClientManager::onReadyRead()
         }
         if (jsonObj.contains("type") && jsonObj["type"].toString() == "find_match_ack") {
             QString status = jsonObj["status"].toString();
-            QString room = jsonObj["room"].toString();
-            QString competitor = jsonObj["competitor"].toString();
+            QString message = jsonObj["message"].toString();
+            QString opponent = jsonObj["opponent"].toString();
+            QString match_id = jsonObj["match_id"].toString();
             QString role = jsonObj["role"].toString();
             if (status == "success") {
-                emit findMatchResult(status, room, competitor, role);
+                emit findMatchResult(status, message, opponent, match_id, role);
             } else {
-                emit findMatchResult(status, "", "", "");
+                emit findMatchResult(status, message, "", "", "");
             }
         }
-        // if (jsonObj.contains("type") && jsonObj["type"].toString() == "create_room_ack") {
-        //     QString status = jsonObj["status"].toString();
-        //     QString room = jsonObj["room"].toString();
-        //     if (status == "success") {
-        //         emit createRoomResult(status, room);
-        //     } else {
-        //         emit createRoomResult(status, "");
-        //     }
-        // }
+        if (jsonObj.contains("type") && jsonObj["type"].toString() == "create_room_ack") {
+            QString status = jsonObj["status"].toString();
+            QString message = jsonObj["message"].toString();
+            emit createRoomResult(status, message);
+        }
     }
 }
 
