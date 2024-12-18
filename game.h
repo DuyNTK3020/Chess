@@ -46,7 +46,10 @@ public:
     void gameOver();
     void removeAll();
     void clearScene();
+    void moveChessPieace();
     static QString role;
+    static QString gameid;
+
 
 
 public slots:
