@@ -294,6 +294,8 @@ void Game::displayLogin() {
                 user->setName(name);
                 user->setToken(token);
                 user->setElo(elo);
+                qDebug() << user->getName();
+                qDebug() << user->getElo();
                 displayWaitConnect();
                 // start("","","","WHITE");
 
@@ -432,7 +434,9 @@ void Game::displayRegister() {
     });
 }
 
-
+extern ClientManager *clientManager;
+extern User *user;
+extern QList<Player*> players;
 void Game::displayWaitConnect() {
 
     clearScene();
@@ -745,6 +749,8 @@ void Game::displayProfile()
     addToScene(newPasswordTitle);
     listG.append(newPasswordTitle);
 
+    qDebug()<<user;
+
     QLineEdit *nameInput = new QLineEdit();
     nameInput->setText(user->getName());
     nameInput->setPlaceholderText("Enter your name");
@@ -755,6 +761,7 @@ void Game::displayProfile()
     listG.append(proxyName);
 
     QLineEdit *eloInput = new QLineEdit();
+    qDebug() << user->getElo();
     eloInput->setText(QString::number(user->getElo()));
     eloInput->setFixedWidth(250);
     QGraphicsProxyWidget *proxyElo = gameScene->addWidget(eloInput);

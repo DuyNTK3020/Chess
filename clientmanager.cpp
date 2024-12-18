@@ -42,22 +42,22 @@ void ClientManager::onReadyRead()
         if (jsonObj.contains("type") && jsonObj["type"].toString() == "register_ack") {
             QString status = jsonObj["status"].toString();
             QString message = jsonObj["message"].toString();
-            qDebug() << "Register " << status << ": " << message;
+            // qDebug() << "Register " << status << ": " << message;
             emit registerResult(status, message);
         }
         if (jsonObj.contains("type") && jsonObj["type"].toString() == "login_ack") {
             QString status = jsonObj["status"].toString();
             QString message = jsonObj["message"].toString();
             QString name = jsonObj["name"].toString();
-            int elo = jsonObj["elo"].toInt();
+            int elo = jsonObj["elo"].toString().toInt();
             QString token = jsonObj["token"].toString();
-            qDebug() << "Login " << status << ": " << message;
+            // qDebug() << "Login " << status << ": " << name << " " << elo;
             emit loginResult(status, message, name, elo, token);  // Đăng nhập thành công
         }
         if (jsonObj.contains("type") && jsonObj["type"].toString() == "connect_ack") {
             QString status = jsonObj["status"].toString();
             QString message = jsonObj["message"].toString();
-            qDebug() << "Connection " << status << ": " << message;
+            // qDebug() << "Connection " << status << ": " << message;
             emit connectionResult(status, message); // Phát tín hiệu kết nối thành công
         }
         if (jsonObj.contains("type") && jsonObj["type"].toString() == "find_match_ack") {
