@@ -571,6 +571,23 @@ void Game::displayWaitFindMatch() {
             listG.append(menuButton);
         }
     });
+
+    connect(clientManager, &ClientManager::createRoomResult, this, [=](const QString &status, const QString &message) {
+        if (status == "success") {
+            displayRoom();
+        } else if (status == "failure") {
+            errorText->setPlainText(message);
+            errorText->setPos(width()/2 - errorText->boundingRect().width()/2, 450);
+
+            Button *menuButton = new Button("Back to Menu");
+            menuButton->setPos(width()/2 - menuButton->boundingRect().width()/2, 500);
+            connect(menuButton, &Button::clicked, this, [=]() {
+                displayMenu();
+            });
+            addToScene(menuButton);
+            listG.append(menuButton);
+        }
+    });
 }
 
 void Game::displayRoom() {
