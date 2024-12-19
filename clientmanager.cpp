@@ -77,6 +77,11 @@ void ClientManager::onReadyRead()
             QString message = jsonObj["message"].toString();
             emit createRoomResult(status, message);
         }
+        if (jsonObj.contains("type") && jsonObj["type"].toString() == "update_profile_ack") {
+            QString status = jsonObj["status"].toString();
+            QString message = jsonObj["message"].toString();
+            emit updateProfileResult(status, message);
+        }
     }
 }
 

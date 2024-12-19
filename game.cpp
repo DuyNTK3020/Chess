@@ -169,6 +169,11 @@ void Game::changeTurn()
 
 void Game::start(const QString &status, const QString &match_id, const QString &opponent, const QString &role)
 {
+    if (background) {
+        gameScene->removeItem(background);
+        delete background;
+        background = nullptr;
+    }
     // drawChessBoard("WHITE");
     drawChessBoard(role);
 
@@ -724,6 +729,8 @@ void Game::displayProfile()
 {
     bool isEdit = false;
     bool isChangePassword = false;
+    QString oldName = user->getName();
+    QString oldPassword = user->getPassword();
 
     // Xóa các mục hiện tại
     clearScene();
@@ -837,6 +844,8 @@ void Game::displayProfile()
 
         proxyPassword->setEnabled(isChangePassword);
         if (isChangePassword) {
+            passwordInput->setText("");
+            newPasswordInput->setText("");
             changePasswordButton->setText("Save");
             editButton->hide();
             proxyNewPassword->show();
@@ -854,23 +863,32 @@ void Game::displayProfile()
     addToScene(changePasswordButton);
     listG.append(changePasswordButton);
 
-    // // Trường nhập mật khẩu mới
-    // QLineEdit *newPasswordInput = new QLineEdit();
-    // newPasswordInput->setPlaceholderText("Enter new password");
-    // newPasswordInput->setEchoMode(QLineEdit::Password); // Ẩn mật khẩu
-    // newPasswordInput->setFixedWidth(200);
-    // QGraphicsProxyWidget *proxyNewPassword = gameScene->addWidget(newPasswordInput);
-    // proxyNewPassword->setPos(width()/2 - newPasswordInput->width()/2, 300);
-    // listG.append(proxyNewPassword);
+    QGraphicsTextItem *errorText = new QGraphicsTextItem("");
+    errorText->setDefaultTextColor(Qt::red);
+    addToScene(errorText);
+    listG.append(errorText);
 
-    // // Trường xác nhận mật khẩu mới
-    // QLineEdit *confirmNewPasswordInput = new QLineEdit();
-    // confirmNewPasswordInput->setPlaceholderText("Confirm new password");
-    // confirmNewPasswordInput->setEchoMode(QLineEdit::Password); // Ẩn mật khẩu
-    // confirmNewPasswordInput->setFixedWidth(200);
-    // QGraphicsProxyWidget *proxyConfirmNewPassword = gameScene->addWidget(confirmNewPasswordInput);
-    // proxyConfirmNewPassword->setPos(width()/2 - confirmNewPasswordInput->width()/2, 350);
-    // listG.append(proxyConfirmNewPassword);
+    connect(clientManager, &ClientManager::updateProfileResult, this, [=](const QString &status, const QString &message) {
+        if (status == "success") {
+            user->setName(nameInput->text());
+            displayProfile();
+        } else if (status == "failure") {
+            nameInput->setText(user->getName());
+            errorText->setPlainText(message);
+            errorText->setPos(width()/2 - errorText->boundingRect().width()/2, 800);
+        }
+    });
+
+    connect(clientManager, &ClientManager::changePasswordResult, this, [=](const QString &status, const QString &message) {
+        if (status == "success") {
+            user->setPassword(passwordInput->text());
+            displayProfile();
+        } else if (status == "failure") {
+            passwordInput->setText(user->getPassword());
+            errorText->setPlainText(message);
+            errorText->setPos(width()/2 - errorText->boundingRect().width()/2, 800);
+        }
+    });
 }
 
 void Game::gameOver()

@@ -26,6 +26,8 @@ signals:
     void connectionResult(const QString &status, const QString &message);
     void findMatchResult(const QString &status, const QString &message, const QString &opponent, const QString &match_id, const QString &role);
     void createRoomResult(const QString &status, const QString &message);
+    void updateProfileResult(const QString &status, const QString &message);
+    void changePasswordResult(const QString &status, const QString &message);
 private slots:
     void onReadyRead();
 
