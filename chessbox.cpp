@@ -79,7 +79,7 @@ void ChessBox::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
 
             if (clientManager) {
-                clientManager->sendMove(game->match_id,"taozai281",7-oldRow,7-oldCol,7-newRow,7-newCol);
+                clientManager->sendMove(game->match_id,user->getUsername(),7-oldRow,7-oldCol,7-newRow,7-newCol);
             }
 
             game->pieceToMove = NULL;
