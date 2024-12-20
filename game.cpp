@@ -230,7 +230,6 @@ extern QList<Player*> players;
 void Game::displayLogin() {
     setBackground();
 
-    // Xóa các mục đã có
     clearScene();
 
     QGraphicsTextItem *titleText = new QGraphicsTextItem("Chess Pro");
@@ -323,64 +322,78 @@ void Game::displayLogin() {
 }
 
 void Game::displayRegister() {
-    // Xóa các mục hiện tại
+    setBackground();
+
     clearScene();
 
     // Tiêu đề
     QGraphicsTextItem *registerTitle = new QGraphicsTextItem("Register");
-    QFont registerFont("arial", 40);
+    QFont registerFont("arial", 50);
     registerTitle->setFont(registerFont);
-    registerTitle->setPos(width()/2 - registerTitle->boundingRect().width()/2, 100);
+    registerTitle->setDefaultTextColor(Qt::white);
+    registerTitle->setPos(width()/2 - registerTitle->boundingRect().width()/2, 150);
     addToScene(registerTitle);
     listG.append(registerTitle);
+
+    QFont fieldFont("Arial", 16);
 
     // Trường nhập tên
     QLineEdit *nameInput = new QLineEdit();
     nameInput->setPlaceholderText("Enter your name");
-    nameInput->setFixedWidth(200);
+    nameInput->setFixedSize(300, 50);
+    nameInput->setFont(fieldFont);
     QGraphicsProxyWidget *proxyName = gameScene->addWidget(nameInput);
-    proxyName->setPos(width()/2 - nameInput->width()/2, 200);
+    proxyName->setPos(width()/2 - nameInput->width()/2, 270);
     listG.append(proxyName);
 
     // Trường nhập tài khoản
     QLineEdit *usernameInput = new QLineEdit();
     usernameInput->setPlaceholderText("Enter username");
-    usernameInput->setFixedWidth(200);
+    usernameInput->setFixedSize(300, 50);
+    usernameInput->setFont(fieldFont);
     QGraphicsProxyWidget *proxyUsername = gameScene->addWidget(usernameInput);
-    proxyUsername->setPos(width()/2 - usernameInput->width()/2, 250);
+    proxyUsername->setPos(width()/2 - usernameInput->width()/2, 340);
     listG.append(proxyUsername);
 
     // Trường nhập mật khẩu
     QLineEdit *passwordInput = new QLineEdit();
     passwordInput->setPlaceholderText("Enter password");
     passwordInput->setEchoMode(QLineEdit::Password); // Ẩn mật khẩu
-    passwordInput->setFixedWidth(200);
+    passwordInput->setFixedSize(300, 50);
+    passwordInput->setFont(fieldFont);
     QGraphicsProxyWidget *proxyPassword = gameScene->addWidget(passwordInput);
-    proxyPassword->setPos(width()/2 - passwordInput->width()/2, 300);
+    proxyPassword->setPos(width()/2 - passwordInput->width()/2, 410);
     listG.append(proxyPassword);
 
     // Trường xác nhận mật khẩu
     QLineEdit *confirmPasswordInput = new QLineEdit();
     confirmPasswordInput->setPlaceholderText("Confirm password");
     confirmPasswordInput->setEchoMode(QLineEdit::Password); // Ẩn mật khẩu
-    confirmPasswordInput->setFixedWidth(200);
+    confirmPasswordInput->setFixedSize(300, 50);
+    confirmPasswordInput->setFont(fieldFont);
     QGraphicsProxyWidget *proxyConfirmPassword = gameScene->addWidget(confirmPasswordInput);
-    proxyConfirmPassword->setPos(width()/2 - confirmPasswordInput->width()/2, 350);
+    proxyConfirmPassword->setPos(width()/2 - confirmPasswordInput->width()/2, 480);
     listG.append(proxyConfirmPassword);
 
-    QGraphicsTextItem *errorText = new QGraphicsTextItem("");
-    errorText->setDefaultTextColor(Qt::red);
-    addToScene(errorText);
-    listG.append(errorText);
+    QFont logFont("Arial", 14);
 
-    QGraphicsTextItem *successText = new QGraphicsTextItem("");
-    successText->setDefaultTextColor(Qt::green);
-    addToScene(successText);
-    listG.append(successText);
+    QGraphicsTextItem *logText = new QGraphicsTextItem("");
+    logText->setFont(logFont);
+    addToScene(logText);
+    listG.append(logText);
 
     // Nút đăng ký
     Button *registerButton = new Button("Register");
-    registerButton->setPos(width()/2 - registerButton->boundingRect().width()/2, 400);
+    registerButton->setPos(width()/2 - registerButton->boundingRect().width()/2, 590);
+    addToScene(registerButton);
+    listG.append(registerButton);
+
+    // Quay lại màn hình đăng nhập
+    Button *loginButton = new Button("Back to Login");
+    loginButton->setPos(width()/2 - loginButton->boundingRect().width()/2, 660);
+    addToScene(loginButton);
+    listG.append(loginButton);
+
     connect(registerButton, &Button::clicked, this, [=]() {
         QString name = nameInput->text();
         QString username = usernameInput->text();
@@ -389,17 +402,17 @@ void Game::displayRegister() {
 
         // Kiểm tra nếu có trường nào còn trống
         if (name.isEmpty() || username.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
-            qDebug() << "All fields must be filled!";
-            errorText->setPlainText("All fields must be filled!");
-            errorText->setPos(width()/2 - errorText->boundingRect().width()/2, 450);
+            logText->setPlainText("All fields must be filled!");
+            logText->setDefaultTextColor(Qt::red);
+            logText->setPos(width()/2 - logText->boundingRect().width()/2, 750);
             return; // Dừng lại không thực hiện đăng ký
         }
 
         // Kiểm tra mật khẩu xác nhận
         if (password != confirmPassword) {
-            qDebug() << "Passwords do not match!";
-            errorText->setPlainText("Passwords do not match!");
-            errorText->setPos(width()/2 - errorText->boundingRect().width()/2, 450);
+            logText->setPlainText("Passwords do not match!");
+            logText->setDefaultTextColor(Qt::red);
+            logText->setPos(width()/2 - logText->boundingRect().width()/2, 750);
             return; // Dừng lại không thực hiện đăng ký
         }
 
@@ -408,30 +421,21 @@ void Game::displayRegister() {
             clientManager->sendRegisterRequest(name, username, password);
         }
     });
-    addToScene(registerButton);
-    listG.append(registerButton);
 
-    // Quay lại màn hình đăng nhập
-    Button *loginButton = new Button("Back to Login");
-    loginButton->setPos(width()/2 - loginButton->boundingRect().width()/2, 500);
     connect(loginButton, &Button::clicked, this, [=]() {
-        // Hiển thị thông báo và chuyển về màn hình login
-        displayLogin();  // Quay lại màn hình login sau khi đăng ký thành công
+        displayLogin();
     });
-    addToScene(loginButton);
-    listG.append(loginButton);
 
-    // Kết nối tín hiệu từ ClientManager
     connect(clientManager, &ClientManager::registerResult, this, [=](const QString &status, const QString &message) {
         qDebug() << message;
         if (status == "success") {
-            successText->setPlainText(message);
-            successText->setPos(width()/2 - successText->boundingRect().width()/2, 450);
-            errorText->setPlainText("");  // Xóa lỗi
+            logText->setPlainText(message);
+            logText->setDefaultTextColor(Qt::green);
+            logText->setPos(width()/2 - logText->boundingRect().width()/2, 700);
         } else if (status == "failure") {
-            errorText->setPlainText(message);
-            errorText->setPos(width()/2 - errorText->boundingRect().width()/2, 450);
-            successText->setPlainText("");  // Xóa thông báo thành công
+            logText->setPlainText(message);
+            logText->setDefaultTextColor(Qt::red);
+            logText->setPos(width()/2 - logText->boundingRect().width()/2, 700);
         }
     });
 }
