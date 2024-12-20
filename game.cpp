@@ -17,6 +17,7 @@
 
 
 QString Game::role = ""; // Khởi tạo giá trị mặc định
+QString Game::match_id = "";
 
 Game::Game(QWidget *parent ):QGraphicsView(parent)
 {
@@ -170,12 +171,15 @@ void Game::changeTurn()
     turnDisplay->setPlainText("Turn : " + getTurn()); // Cập nhật hiển thị lượt
 }
 
-void Game::start(const QString &status, const QString &room, const QString &competitor, const QString &role)
+void Game::start(const QString &status, const QString &match_id, const QString &competitor, const QString &role)
 {
+    drawChessBoard(role);
+
     // Xóa các đối tượng khỏi Scene
     clearScene();
     Game::role = role; // Gán giá trị mới cho biến static
-
+    Game::match_id = match_id;
+    qDebug()<< " match_id :" << Game::match_id;
     addToScene(turnDisplay);
     QGraphicsTextItem* whitePiece = new QGraphicsTextItem();
     whitePiece->setPos(70,10);
@@ -194,6 +198,7 @@ void Game::start(const QString &status, const QString &room, const QString &comp
     addToScene(blackPiece);
     addToScene(check); // Thêm thông báo "CHECK"
     chess->addChessPiece(role); // Thêm các quân cờ vào bàn cờ
+
 }
 
 void Game::drawDeadHolder(int x, int y,QColor color)
@@ -298,8 +303,8 @@ void Game::displayLogin() {
                 user->setElo(elo);
                 qDebug() << user->getName();
                 qDebug() << user->getElo();
-                displayWaitConnect();
-                // start("","","","WHITE");
+                //displayWaitConnect();
+                 start("","110","","WHITE");
 
             } else if (status == "failure") {
                 errorText->setPlainText(message);
@@ -317,7 +322,7 @@ void Game::displayLogin() {
     addToScene(registerButton);
     listG.append(registerButton);
 
-     // drawChessBoard("WHITE");
+      //drawChessBoard("WHITE");
 }
 
 void Game::displayRegister() {
@@ -880,30 +885,6 @@ void Game::clearScene() {
     listG.clear();
 }
 
-void moveChessPiece(int oldCol, int oldRow, int newCol, int newRow) {
-    // Lấy ô cũ và ô mới
-    ChessBox *oldBox = game->board[oldRow][oldCol];
-    ChessBox *newBox = game->board[newRow][newCol];
 
-    // Lấy quân cờ từ ô cũ
-    ChessPiece *piece = oldBox->currentPiece;
 
-    if (!piece) {
-        qDebug() << "Không có quân cờ ở vị trí (" << oldCol << ", " << oldRow << ")";
-        return;
-    }
 
-    // Cập nhật trạng thái ô cũ
-    oldBox->setHasChessPiece(false);
-    oldBox->currentPiece = nullptr;
-
-    // Cập nhật trạng thái ô mới
-    newBox->setHasChessPiece(true);
-    newBox->currentPiece = piece;
-
-    // Cập nhật vị trí của quân cờ
-    piece->setCurrentBox(newBox);
-
-    qDebug() << "Di chuyển quân cờ từ (" << oldCol << ", " << oldRow
-             << ") đến (" << newCol << ", " << newRow << ")";
-}

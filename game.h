@@ -46,14 +46,14 @@ public:
     void gameOver();
     void removeAll();
     void clearScene();
-    void moveChessPieace();
     static QString role;
-    static QString gameid;
+    static QString match_id;
+
 
 
 
 public slots:
-    void start(const QString &status, const QString &room, const QString &competitor, const QString &role);
+    void start(const QString &status, const QString &match_id, const QString &competitor, const QString &role);
 
 private:
     QGraphicsPixmapItem* background = nullptr;

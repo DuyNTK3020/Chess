@@ -42,6 +42,11 @@ void ChessPiece::mousePressEvent(QGraphicsSceneMouseEvent *event)
         }
     }
 
+
+
+
+
+
 }
 
 void ChessPiece::setCurrentBox(ChessBox *box)
@@ -57,6 +62,7 @@ ChessBox *ChessPiece::getCurrentBox()
 
 QString ChessPiece::getSide()
 {
+    qDebug() << "Đang lấy side của ChessPiece:" << side;
     return side;
 }
 
@@ -101,3 +107,43 @@ bool ChessPiece::boxSetting(ChessBox *box)
         location.last()->setColor(Qt::darkRed);
     return false;
 }
+
+void ChessPiece::moveChessPiece(int oldCol, int oldRow, int newCol, int newRow) {
+    qDebug() << "Bắt đầu di chuyển từ (" << oldCol << "," << oldRow << ") đến (" << newCol << "," << newRow << ")";
+
+    ChessBox *oldBox = game->collection[oldRow][oldCol];
+    ChessBox *newBox = game->collection[newRow][newCol];
+
+    if (!oldBox || !newBox) {
+        qDebug() << "Ô cũ hoặc ô mới không hợp lệ!";
+        return;
+    }
+
+    qDebug() << "Ô cũ hoặc ô mới có hợp lệ!";
+
+    if (!oldBox->currentPiece) {
+        qDebug() << "currentPiece là null.";
+    } else {
+        qDebug() << "currentPiece không phải là null.";
+    }
+
+
+
+    ChessPiece *piece = oldBox->currentPiece;
+    //qDebug() << "oldBox:" << oldBox << ", currentPiece:" << oldBox->currentPiece;
+
+    qDebug() << "Quân cờ tại (" << oldCol << "," << oldRow << ") là của bên: " << piece->getSide();
+
+    //if (!piece) {
+    //    qDebug() << "Không có quân cờ ở vị trí (" << oldCol << "," << oldRow << ")";
+    //    return;
+    //}
+
+
+
+
+    qDebug() << "Di chuyển quân cờ thành công từ (" << oldCol << "," << oldRow << ") đến (" << newCol << "," << newRow << ")";
+}
+
+
+
