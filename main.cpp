@@ -44,58 +44,6 @@ int main(int argc, char *argv[])
     game = new Game();
     game->show();
     game->displayLogin();
-    //game->moveChessPiece(1,2,1,3);
-
-    ChessBox *oldBox = new ChessBox();
-    ChessBox *newBox = new ChessBox();
-
-
-
-    oldBox = game->collection[1][0];
-    newBox = game->collection[1][1];
-
-    if(!game->collection[1][0]){
-        qDebug()<< "Null vai lon";
-    }
-
-    if (!oldBox || !newBox) {
-        qDebug() << "Ô cũ hoặc ô mới không hợp lệ!";
-        //return;
-    }
-
-    qDebug() << "Ô cũ hoặc ô mới có hợp lệ!";
-
-    if (!oldBox->currentPiece) {
-        qDebug() << "currentPiece là null.";
-    } else {
-        qDebug() << "currentPiece không phải là null.";
-    }
-
-
-
-    ChessPiece *piece = oldBox->currentPiece;
-    //qDebug() << "oldBox:" << oldBox << ", currentPiece:" << oldBox->currentPiece;
-
-   // qDebug() << piece->getSide();
-
-    //if (!piece) {
-    //    qDebug() << "Không có quân cờ ở vị trí (" << oldCol << "," << oldRow << ")";
-    //    return;
-    //}
-
-
-    //oldBox->setHasChessPiece(false);
-    //oldBox->currentPiece = NULL;
-
-    //newBox->setHasChessPiece(true);
-    //newBox->currentPiece = piece;
-
-    //piece->setCurrentBox(newBox);
-
-
-
-    //game->displayProfile();S
-
 
     return a.exec();
 }

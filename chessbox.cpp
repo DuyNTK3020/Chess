@@ -2,11 +2,13 @@
 #include "game.h"
 #include <QDebug>
 #include "king.h"
+#include "user.h"
 #include "clientmanager.h"
 
 
 extern Game *game;
 extern ClientManager *clientManager;
+extern User *user;
 
 ChessBox::ChessBox(QGraphicsItem *parent):QGraphicsRectItem(parent)
 {
