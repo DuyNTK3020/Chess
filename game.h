@@ -39,7 +39,7 @@ public:
     void displayLogin();
     void displayRegister();
     void displayWaitConnect();
-    void displayMenu();
+    void displayMenu(const QString &logText);
     void displayWaitFindMatch();
     void displayRoom();
     void displayProfile();

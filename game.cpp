@@ -14,6 +14,7 @@
 #include <QPushButton>
 #include <QGraphicsProxyWidget>
 #include <QScrollBar>
+#include <QTimer>
 
 
 QString Game::role = ""; // Khởi tạo giá trị mặc định
@@ -444,158 +445,189 @@ extern ClientManager *clientManager;
 extern User *user;
 extern QList<Player*> players;
 void Game::displayWaitConnect() {
+    setBackground();
 
     clearScene();
 
-    QGraphicsTextItem *titleText = new QGraphicsTextItem("WaitConnect");
+    QGraphicsTextItem *titleText = new QGraphicsTextItem("Waitting Connect...");
     QFont titleFont("arial", 50);
     titleText->setFont(titleFont);
-    int xPos = width()/2 - titleText->boundingRect().width()/2;
-    int yPos = 150;
-    titleText->setPos(xPos, yPos);
+    titleText->setDefaultTextColor(Qt::white);
+    titleText->setPos(width()/2 - titleText->boundingRect().width()/2, 150);
     addToScene(titleText);
     listG.append(titleText);
 
-    QGraphicsTextItem *errorText = new QGraphicsTextItem("");
-    errorText->setDefaultTextColor(Qt::red);
-    addToScene(errorText);
-    listG.append(errorText);
+    QFont logFont("Arial", 36);
 
-    // Gửi yêu cầu connect với token giả định (có thể thay đổi)
+    QGraphicsTextItem *logText = new QGraphicsTextItem("");
+    logText->setFont(logFont);
+    logText->setDefaultTextColor(Qt::white);
+    addToScene(logText);
+    listG.append(logText);
+
     if (clientManager) {
         clientManager->sendConnectRequest(user->getToken());
     }
 
+    QTimer *timer = new QTimer(this);
+    int *counter = new int(0);
+
+    connect(timer, &QTimer::timeout, this, [=]() mutable {
+        if (*counter < 10) {
+            *counter += 1;
+            logText->setPlainText(QString("Waiting... %1").arg(*counter));
+            logText->setPos(width()/2 - logText->boundingRect().width()/2, 350);
+        } else {
+            timer->stop();
+        }
+    });
+
+    timer->start(1000);
+
     // Kết nối tín hiệu từ ClientManager
     connect(clientManager, &ClientManager::connectionResult, this, [=](const QString &status, const QString &message) {
+        timer->stop();
+
         if (status == "success") {
-            displayMenu();
+            displayMenu("");
         } else if (status == "failure") {
-            errorText->setPlainText(message);
-            errorText->setPos(width()/2 - errorText->boundingRect().width()/2, 450);
+            logText->setPlainText(message);
+            logText->setDefaultTextColor(Qt::red);
+            logText->setPos(width()/2 - logText->boundingRect().width()/2, 350);
 
             Button *loginButton = new Button("Back to Login");
             loginButton->setPos(width()/2 - loginButton->boundingRect().width()/2, 500);
+            addToScene(loginButton);
+            listG.append(loginButton);
+
             connect(loginButton, &Button::clicked, this, [=]() {
                 displayLogin();
             });
-            addToScene(loginButton);
-            listG.append(loginButton);
         }
     });
 }
 
-void Game::displayMenu() {
+void Game::displayMenu(const QString &logTextResult) {
+    setBackground();
+
     clearScene();
 
     QGraphicsTextItem *titleText = new QGraphicsTextItem("Chess Pro");
     QFont titleFont("arial", 50);
     titleText->setFont(titleFont);
-    int xPos = width()/2 - titleText->boundingRect().width()/2;
-    int yPos = 150;
-    titleText->setPos(xPos, yPos);
+    titleText->setDefaultTextColor(Qt::white);
+    titleText->setPos(width()/2 - titleText->boundingRect().width()/2, 150);
     addToScene(titleText);
     listG.append(titleText);
-
-    QGraphicsTextItem *errorText = new QGraphicsTextItem("");
-    errorText->setDefaultTextColor(Qt::red);
-    errorText->setPos(width()/2, 650);
-    addToScene(errorText);
-    listG.append(errorText);
 
     // Nút tìm trận
     Button *findMatchButton = new Button("Find Match");
     int btnXPos = width()/2 - findMatchButton->boundingRect().width()/2;
     int btnYPos = 300;
-    findMatchButton->setPos(btnXPos, btnYPos);
-
-    connect(findMatchButton, &Button::clicked, this, [=]() {
-        displayWaitFindMatch();
-    });
-
+    findMatchButton->setPos(width()/2 - findMatchButton->boundingRect().width()/2, 300);
     addToScene(findMatchButton);
     listG.append(findMatchButton);
 
     // Nút tạo phòng
     Button *createRoomButton = new Button("Create Room");
     createRoomButton->setPos(btnXPos, btnYPos + 100);
-    connect(createRoomButton, &Button::clicked, this, [=]() {
-        if (clientManager) {
-            clientManager->sendCreateRoomRequest(user->getUsername());
-        }
-    });
     addToScene(createRoomButton);
     listG.append(createRoomButton);
 
     // Nút quản lý người dùng
     Button *openProfileButton = new Button("Open Profile");
     openProfileButton->setPos(btnXPos, btnYPos + 200);
-    connect(openProfileButton, &Button::clicked, this, [=]() {
-        displayProfile();
-    });
     addToScene(openProfileButton);
     listG.append(openProfileButton);
-}
 
-void Game::displayWaitFindMatch() {
-    clearScene();
+    QFont logFont("Arial", 36);
 
-    QGraphicsTextItem *titleText = new QGraphicsTextItem("Wait find match");
-    QFont titleFont("arial", 50);
-    titleText->setFont(titleFont);
-    int xPos = width()/2 - titleText->boundingRect().width()/2;
-    int yPos = 150;
-    titleText->setPos(xPos, yPos);
-    addToScene(titleText);
-    listG.append(titleText);
+    QGraphicsTextItem *logText = new QGraphicsTextItem(logTextResult);
+    logText->setFont(logFont);
+    logText->setDefaultTextColor(Qt::red);
+    logText->setPos(width()/2 - logText->boundingRect().width()/2, btnYPos + 300);
+    addToScene(logText);
+    listG.append(logText);
 
-    QGraphicsTextItem *errorText = new QGraphicsTextItem("");
-    errorText->setDefaultTextColor(Qt::red);
-    addToScene(errorText);
-    listG.append(errorText);
+    connect(findMatchButton, &Button::clicked, this, [=]() {
+        displayWaitFindMatch();
+    });
 
-    // Gửi yêu cầu connect với token giả định (có thể thay đổi)
-    if (clientManager) {
-        clientManager->sendFindMatchRequest(user->getUsername());
-    }
-
-    // Kết nối tín hiệu từ ClientManager
-    connect(clientManager, &ClientManager::findMatchResult, this, [=](const QString &status, const QString &message, const QString &opponent, const QString &match_id, const QString &role) {
-        if (status == "success") {
-            start(status,match_id,opponent,role);
-        } else if (status == "failure") {
-            errorText->setPlainText(message);
-            errorText->setPos(width()/2 - errorText->boundingRect().width()/2, 450);
-
-            Button *menuButton = new Button("Back to Menu");
-            menuButton->setPos(width()/2 - menuButton->boundingRect().width()/2, 500);
-            connect(menuButton, &Button::clicked, this, [=]() {
-                displayMenu();
-            });
-            addToScene(menuButton);
-            listG.append(menuButton);
+    connect(createRoomButton, &Button::clicked, this, [=]() {
+        if (clientManager) {
+            clientManager->sendCreateRoomRequest(user->getUsername());
         }
+    });
+
+    connect(openProfileButton, &Button::clicked, this, [=]() {
+        displayProfile();
     });
 
     connect(clientManager, &ClientManager::createRoomResult, this, [=](const QString &status, const QString &message) {
         if (status == "success") {
             displayRoom();
         } else if (status == "failure") {
-            errorText->setPlainText(message);
-            errorText->setPos(width()/2 - errorText->boundingRect().width()/2, 450);
+            logText->setPlainText(message);
+            logText->setPos(width()/2 - logText->boundingRect().width()/2, btnYPos + 300);
+        }
+    });
+}
 
-            Button *menuButton = new Button("Back to Menu");
-            menuButton->setPos(width()/2 - menuButton->boundingRect().width()/2, 500);
-            connect(menuButton, &Button::clicked, this, [=]() {
-                displayMenu();
-            });
-            addToScene(menuButton);
-            listG.append(menuButton);
+void Game::displayWaitFindMatch() {
+    setBackground();
+
+    clearScene();
+
+    QGraphicsTextItem *titleText = new QGraphicsTextItem("Waitting Find Match...");
+    QFont titleFont("arial", 50);
+    titleText->setFont(titleFont);
+    titleText->setDefaultTextColor(Qt::white);
+    titleText->setPos(width()/2 - titleText->boundingRect().width()/2, 150);
+    addToScene(titleText);
+    listG.append(titleText);
+
+    QFont logFont("Arial", 36);
+
+    QGraphicsTextItem *logText = new QGraphicsTextItem("");
+    logText->setFont(logFont);
+    logText->setDefaultTextColor(Qt::white);
+    addToScene(logText);
+    listG.append(logText);
+
+    if (clientManager) {
+        clientManager->sendFindMatchRequest(user->getUsername());
+    }
+
+    QTimer *timer = new QTimer(this);
+    int *counter = new int(0);
+
+    connect(timer, &QTimer::timeout, this, [=]() mutable {
+        if (*counter < 5) {
+            *counter += 1;
+            logText->setPlainText(QString("Waiting Find Match... %1").arg(*counter));
+            logText->setPos(width()/2 - logText->boundingRect().width()/2, 350);
+        } else {
+            timer->stop();
+            displayMenu("Time limited");
+        }
+    });
+
+    timer->start(1000);
+
+    // Kết nối tín hiệu từ ClientManager
+    connect(clientManager, &ClientManager::findMatchResult, this, [=](const QString &status, const QString &message, const QString &opponent, const QString &match_id, const QString &role) {
+        timer->stop();
+        if (status == "success") {
+            start(status,match_id,opponent,role);
+        } else if (status == "failure") {
+            displayMenu(message);
         }
     });
 }
 
 void Game::displayRoom() {
+    setBackground();
+
     clearScene();
 
     QGraphicsTextItem *titleText = new QGraphicsTextItem("Room");
@@ -735,7 +767,9 @@ void Game::displayRoom() {
     outButton->setPos(300, 50);
     addToScene(outButton);
     listG.append(outButton);
-    connect(outButton, &Button::clicked, this, &Game::displayMenu);
+    connect(outButton, &Button::clicked, this, [=]() mutable {
+        displayMenu("");
+    });
 
     QGraphicsRectItem* lockBackground = new QGraphicsRectItem(350, 450, 300, 100);
     lockBackground->setBrush(QBrush(Qt::black));
