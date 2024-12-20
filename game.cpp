@@ -66,12 +66,11 @@ void Game::setBackground() {
     background = new QGraphicsPixmapItem(QPixmap(":/images/background.jpg"));
     background->setZValue(-1); // Đặt Z-value thấp nhất để luôn ở phía sau
 
-    // Thiết lập kích thước nền là 600x600 và đặt vị trí tại (0, 300)
-    background->setPixmap(QPixmap(":/images/background.jpg").scaled(800, 900));
+    background->setPixmap(QPixmap(":/images/background.jpg").scaled(1400, 900));
 
-    background->setPos(300, 0); // Đặt vị trí của background
+    background->setPos(0, 0); // Đặt vị trí của background
 
-    background->setOpacity(0.8);
+    background->setOpacity(0.5);
 
     gameScene->addItem(background); // Thêm nền vào Scene
 }
@@ -227,22 +226,10 @@ void Game::displayLogin() {
     // Xóa các mục đã có
     clearScene();
 
-    // Tạo ảnh nền và tiêu đề
-    QGraphicsPixmapItem *p = new QGraphicsPixmapItem();
-    p->setPixmap(QPixmap(":/images/king1.png"));
-    p->setPos(420,170);
-    addToScene(p);
-    listG.append(p);
-
-    QGraphicsPixmapItem *p1 = new QGraphicsPixmapItem();
-    p1->setPixmap(QPixmap(":/images/king.png"));
-    p1->setPos(920,170);
-    addToScene(p1);
-    listG.append(p1);
-
     QGraphicsTextItem *titleText = new QGraphicsTextItem("Chess Pro");
     QFont titleFont("arial", 50);
     titleText->setFont(titleFont);
+    titleText->setDefaultTextColor(Qt::white);
     int xPos = width()/2 - titleText->boundingRect().width()/2;
     int yPos = 150;
     titleText->setPos(xPos, yPos);
@@ -252,29 +239,36 @@ void Game::displayLogin() {
     // Tạo trường nhập tên người dùng
     QLineEdit *usernameInput = new QLineEdit();
     usernameInput->setPlaceholderText("Enter username");
-    usernameInput->setFixedWidth(200);
+    usernameInput->setFixedSize(300, 50);
+    QFont usernameFont("Arial", 16);
+    usernameInput->setFont(usernameFont);
     QGraphicsProxyWidget *proxyUsername = gameScene->addWidget(usernameInput);
-    proxyUsername->setPos(width()/2 - usernameInput->width()/2, 300);
+    proxyUsername->setPos(width()/2 - usernameInput->width()/2, 270);
     listG.append(proxyUsername);
 
     // Tạo trường nhập mật khẩu
     QLineEdit *passwordInput = new QLineEdit();
     passwordInput->setPlaceholderText("Enter password");
-    passwordInput->setEchoMode(QLineEdit::Password); // Ẩn mật khẩu
-    passwordInput->setFixedWidth(200);
+    passwordInput->setEchoMode(QLineEdit::Password);
+    passwordInput->setFixedSize(300, 50);
+    QFont passwordFont("Arial", 16);
+    passwordInput->setFont(passwordFont);
     QGraphicsProxyWidget *proxyPassword = gameScene->addWidget(passwordInput);
-    proxyPassword->setPos(width()/2 - passwordInput->width()/2, 350);
+    proxyPassword->setPos(width()/2 - passwordInput->width()/2, 340);
     listG.append(proxyPassword);
+
+    QFont logFont("Arial", 14);
 
     QGraphicsTextItem *errorText = new QGraphicsTextItem("");
     errorText->setDefaultTextColor(Qt::red);
+    errorText->setFont(logFont);
     addToScene(errorText);
     listG.append(errorText);
 
     // Nút đăng nhập
     Button *loginButton = new Button("Login");
     int btnXPos = width()/2 - loginButton->boundingRect().width()/2;
-    int btnYPos = 400;
+    int btnYPos = 450;
     loginButton->setPos(btnXPos, btnYPos);
     connect(loginButton, &Button::clicked, this, [=]() {
         QString username = usernameInput->text();
@@ -285,7 +279,7 @@ void Game::displayLogin() {
             qDebug() << "All fields must be filled!";
             errorText->setPlainText("All fields must be filled!");
             errorText->setPos(width()/2 - errorText->boundingRect().width()/2, 450);
-            return; // Dừng lại không thực hiện đăng ký
+            return;
         }
 
         if (clientManager) {
@@ -304,7 +298,7 @@ void Game::displayLogin() {
 
             } else if (status == "failure") {
                 errorText->setPlainText(message);
-                errorText->setPos(width()/2 - errorText->boundingRect().width()/2, 450);
+                errorText->setPos(width()/2 - errorText->boundingRect().width()/2, 700);
             }
         });
     });
@@ -313,12 +307,13 @@ void Game::displayLogin() {
 
     // Nút đăng ký
     Button *registerButton = new Button("Register");
-    registerButton->setPos(btnXPos, btnYPos + 100);
+    registerButton->setPos(btnXPos, btnYPos + 70);
     connect(registerButton, &Button::clicked, this, &Game::displayRegister);
     addToScene(registerButton);
     listG.append(registerButton);
 
-    // drawChessBoard("WHITE");
+    errorText->setPlainText("Test");
+    errorText->setPos(width()/2 - errorText->boundingRect().width()/2, 600);
 }
 
 void Game::displayRegister() {

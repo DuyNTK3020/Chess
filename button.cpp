@@ -1,6 +1,7 @@
 #include "button.h"
 #include <QGraphicsTextItem>
 #include <QBrush>
+#include <QFont>
 
 Button::Button(QString name, QGraphicsItem *parent)
     :QGraphicsRectItem(parent)
@@ -12,8 +13,11 @@ Button::Button(QString name, QGraphicsItem *parent)
     brush.setColor(Qt::darkRed);
     setBrush(brush);
 
+    QFont buttonFont("Arial", 16);
+
     //draw Text
     text = new QGraphicsTextItem(name,this);
+    text->setFont(buttonFont);
     int xPos = rect().width()/2 - text->boundingRect().width()/2;
     int yPos = rect().height()/2 - text->boundingRect().height()/2;
     text->setPos(xPos,yPos);
