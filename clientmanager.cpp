@@ -19,15 +19,34 @@ void ClientManager::connectToServer(const QString &host, int port)
     }
 }
 
-void ClientManager::sendMove(const QString &moveData)
+void ClientManager::sendMove(const QString &game_id, const QString &username,
+                             int oldRow, int oldCol, int newRow, int newCol)
 {
+    // Tạo đối tượng JSON để gửi
+    QJsonObject json;
+    json["type"] = "move";  // Loại yêu cầu
+    json["game_id"] = game_id;  // ID của game
+    json["username"] = username;  // Tên tài khoản người dùng
+    json["old_row"] = oldRow;  // Hàng cũ
+    json["old_col"] = oldCol;  // Cột cũ
+    json["new_row"] = newRow;  // Hàng mới
+    json["new_col"] = newCol;  // Cột mới
+
+    // Chuyển đổi đối tượng JSON thành chuỗi byte (UTF-8)
+    QJsonDocument doc(json);
+    QByteArray data = doc.toJson(QJsonDocument::Compact);  // Sử dụng định dạng gọn gàng
+
+    // Kiểm tra xem socket có thể ghi dữ liệu không
     if (socket && socket->isWritable()) {
-        socket->write(moveData.toUtf8());
-        socket->flush();
+        // Gửi dữ liệu qua socket
+        socket->write(data);
+        socket->flush();  // Đảm bảo dữ liệu được gửi ngay lập tức
+        qDebug() << "Sent move request:" << data;
     } else {
         qDebug() << "Socket not writable!";
     }
 }
+
 
 void ClientManager::onReadyRead()
 {

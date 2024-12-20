@@ -31,6 +31,10 @@ public:
     bool firstMove;
 
     bool boxSetting(ChessBox *box);
+    void moveChessPiece(int oldCol, int oldRow, int newCol, int newRow);
+
+
+
 signals:
     void moveMade(const QString &moveData);
 protected:

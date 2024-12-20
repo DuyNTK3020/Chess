@@ -47,8 +47,15 @@ public:
     void gameOver();
     void removeAll();
     void clearScene();
+    static QString role;
+    static QString match_id;
+
+
+
+
 public slots:
     void start(const QString &status, const QString &match_id, const QString &opponent, const QString &role);
+
 private:
     QGraphicsPixmapItem* background = nullptr;
     QGraphicsScene *gameScene;

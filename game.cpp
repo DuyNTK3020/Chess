@@ -15,6 +15,10 @@
 #include <QGraphicsProxyWidget>
 #include <QScrollBar>
 
+
+QString Game::role = ""; // Khởi tạo giá trị mặc định
+QString Game::match_id = "";
+
 Game::Game(QWidget *parent ):QGraphicsView(parent)
 {
     // Tạo Scene cho game
@@ -178,7 +182,9 @@ void Game::start(const QString &status, const QString &match_id, const QString &
 
     // Xóa các đối tượng khỏi Scene
     clearScene();
-
+    Game::role = role; // Gán giá trị mới cho biến static
+    Game::match_id = match_id;
+    qDebug()<< " match_id :" << Game::match_id;
     addToScene(turnDisplay);
     QGraphicsTextItem* whitePiece = new QGraphicsTextItem();
     whitePiece->setPos(70,10);
@@ -197,6 +203,7 @@ void Game::start(const QString &status, const QString &match_id, const QString &
     addToScene(blackPiece);
     addToScene(check); // Thêm thông báo "CHECK"
     chess->addChessPiece(role); // Thêm các quân cờ vào bàn cờ
+
 }
 
 void Game::drawDeadHolder(int x, int y,QColor color)
@@ -312,8 +319,7 @@ void Game::displayLogin() {
     addToScene(registerButton);
     listG.append(registerButton);
 
-    errorText->setPlainText("Test");
-    errorText->setPos(width()/2 - errorText->boundingRect().width()/2, 600);
+      //drawChessBoard("WHITE");
 }
 
 void Game::displayRegister() {
