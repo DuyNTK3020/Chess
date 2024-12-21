@@ -1,8 +1,11 @@
 #include "clientmanager.h"
+#include "player.h"
 #include <QJsonObject>
 #include <QJsonDocument>
 #include <QTcpSocket>
 #include <QDebug>
+#include <QJsonArray>
+#include <QJsonObject>
 
 ClientManager::ClientManager(QObject *parent) : QObject(parent), socket(new QTcpSocket(this))
 {
@@ -100,6 +103,27 @@ void ClientManager::onReadyRead()
             QString status = jsonObj["status"].toString();
             QString message = jsonObj["message"].toString();
             emit updateProfileResult(status, message);
+        }
+        if (jsonObj.contains("type") && jsonObj["type"].toString() == "get_list_player_ack") {
+            QString status = jsonObj["status"].toString();
+            QString message = jsonObj["message"].toString();
+
+            QList<Player> players;
+            if (jsonObj.contains("players") && jsonObj["players"].isArray()) {
+                QJsonArray playersArray = jsonObj["players"].toArray();
+                for (const QJsonValue &value : playersArray) {
+                    if (value.isObject()) {
+                        QJsonObject playerObj = value.toObject();
+                        players.append(Player(playerObj)); // Thêm đối tượng Player
+                    }
+                }
+            }
+            emit getListPlayerResult(status, message, players);
+        }
+        if (jsonObj.contains("type") && jsonObj["type"].toString() == "invite_player_ack") {
+            QString username = jsonObj["username"].toString();
+            QString name = jsonObj["name"].toString();
+            emit invitePlayerResult(username, name);
         }
     }
 }
@@ -224,6 +248,61 @@ void ClientManager::sendChangePasswordRequest(const QString &username, const QSt
     json["type"] = "change_password";
     json["username"] = username;
     json["password"] = password;
+
+    QJsonDocument doc(json);
+    QByteArray data = doc.toJson(QJsonDocument::Compact);
+
+    if (socket && socket->isWritable()) {
+        socket->write(data);
+        socket->flush();
+        qDebug() << "Sent connect request:" << data;
+    } else {
+        qDebug() << "Socket not writable!";
+    }
+}
+
+void ClientManager::sendGetListPlayerRequest(const QString &username) {
+    QJsonObject json;
+    json["type"] = "get_list_player";
+    json["username"] = username;
+
+    QJsonDocument doc(json);
+    QByteArray data = doc.toJson(QJsonDocument::Compact);
+
+    if (socket && socket->isWritable()) {
+        socket->write(data);
+        socket->flush();
+        qDebug() << "Sent connect request:" << data;
+    } else {
+        qDebug() << "Socket not writable!";
+    }
+}
+
+void ClientManager::sendInvitePlayerRequest(const QString &username, const QString &name, const QString &invitePlayer) {
+    QJsonObject json;
+    json["type"] = "invite_player";
+    json["username"] = username;
+    json["name"] = name;
+    json["invite_player"] = invitePlayer;
+
+    QJsonDocument doc(json);
+    QByteArray data = doc.toJson(QJsonDocument::Compact);
+
+    if (socket && socket->isWritable()) {
+        socket->write(data);
+        socket->flush();
+        qDebug() << "Sent connect request:" << data;
+    } else {
+        qDebug() << "Socket not writable!";
+    }
+}
+
+void ClientManager::sendRespondInviteRequest(const QString &status, const QString &username, const QString &invite_player) {
+    QJsonObject json;
+    json["type"] = "respond_invite";
+    json["status"] = status;
+    json["username"] = username;
+    json["invite_player"] = invite_player;
 
     QJsonDocument doc(json);
     QByteArray data = doc.toJson(QJsonDocument::Compact);

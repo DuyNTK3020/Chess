@@ -67,3 +67,8 @@ void Button::setText(const QString &newText) {
     int yPos = rect().height() / 2 - text->boundingRect().height() / 2;
     text->setPos(xPos, yPos);
 }
+
+void Button::setFont() {
+    QFont buttonFont("Arial", 12);
+    text->setFont(buttonFont);
+}

@@ -4,6 +4,8 @@
 #include <QGraphicsScene>
 #include <chessboard.h>
 #include "chesspiece.h"
+#include "player.h"
+#include "button.h"
 class Game:public QGraphicsView
 {
     Q_OBJECT
@@ -41,8 +43,11 @@ public:
     void displayWaitConnect();
     void displayMenu(const QString &logText);
     void displayWaitFindMatch();
-    void displayRoom();
+    void displayRoom(Player *player);
     void displayProfile();
+
+    void clearInvitation(QGraphicsTextItem *inviteText, Button *acceptButton, Button *declineButton);
+    void createPlayerListView(const QList<Player *> &playerList);
 
     void gameOver();
     void removeAll();

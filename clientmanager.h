@@ -4,6 +4,8 @@
 #include <QObject>
 #include <QTcpSocket>
 
+#include "player.h"
+
 class ClientManager : public QObject
 {
     Q_OBJECT
@@ -18,6 +20,9 @@ public:
     void sendCreateRoomRequest(const QString &username);
     void sendUpdateProfileRequest(const QString &username, const QString &name);
     void sendChangePasswordRequest(const QString &username, const QString &password);
+    void sendGetListPlayerRequest(const QString &username);
+    void sendInvitePlayerRequest(const QString &username, const QString &name, const QString &invitePlayer);
+    void sendRespondInviteRequest(const QString &status, const QString &username, const QString &invite_player);
 
 signals:
     void moveReceived(const QString &moveData);
@@ -28,6 +33,10 @@ signals:
     void createRoomResult(const QString &status, const QString &message);
     void updateProfileResult(const QString &status, const QString &message);
     void changePasswordResult(const QString &status, const QString &message);
+    void getListPlayerResult(const QString &status, const QString &message, const QList<Player> &players);
+    void invitePlayerResult(const QString &username, const QString &name);
+    void respondInviteResult(const QString &status, const QString &message, Player &player);
+
 private slots:
     void onReadyRead();
 

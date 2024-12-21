@@ -549,6 +549,9 @@ void Game::displayMenu(const QString &logTextResult) {
     addToScene(logText);
     listG.append(logText);
 
+    QFont inviteFont("Arial", 12);
+    QGraphicsScene *listInviteScene = new QGraphicsScene();
+
     connect(findMatchButton, &Button::clicked, this, [=]() {
         displayWaitFindMatch();
     });
@@ -565,11 +568,65 @@ void Game::displayMenu(const QString &logTextResult) {
 
     connect(clientManager, &ClientManager::createRoomResult, this, [=](const QString &status, const QString &message) {
         if (status == "success") {
-            displayRoom();
+            displayRoom(nullptr);
         } else if (status == "failure") {
             logText->setPlainText(message);
             logText->setPos(width()/2 - logText->boundingRect().width()/2, btnYPos + 300);
         }
+    });
+
+    connect(clientManager, &ClientManager::invitePlayerResult, this, [=](const QString &username, const QString &name) {
+        QGraphicsTextItem *inviteText1 = new QGraphicsTextItem("Invitation from");
+        inviteText1->setFont(inviteFont);
+        inviteText1->setDefaultTextColor(Qt::black);
+        inviteText1->setPos(- 200, 65);
+        listInviteScene->addItem(inviteText1);
+        QGraphicsTextItem *inviteText2 = new QGraphicsTextItem(name);
+        inviteText2->setFont(inviteFont);
+        inviteText2->setDefaultTextColor(Qt::black);
+        inviteText2->setPos(- 200, 85);
+        listInviteScene->addItem(inviteText2);
+
+        Button *acceptButton = new Button("Accept");
+        acceptButton->setFont();
+        acceptButton->setRect(- 70,50,100,30);
+        acceptButton->alignText(- 70,50);
+        listInviteScene->addItem(acceptButton);
+
+        Button *declineButton = new Button("Decline");
+        declineButton->setFont();
+        declineButton->setRect(- 70,90,100,30);
+        declineButton->alignText(- 70,90);
+        listInviteScene->addItem(declineButton);
+
+        QGraphicsView *listInviteView = new QGraphicsView();
+        listInviteView->setScene(listInviteScene);
+        listInviteView->setFixedSize(250, 100);
+
+        QGraphicsProxyWidget *proxyInviteWidget = new QGraphicsProxyWidget();
+        proxyInviteWidget->setWidget(listInviteView);
+
+        addToScene(proxyInviteWidget);
+        listG.append(proxyInviteWidget);
+
+        // Tạo bộ đếm thời gian để ẩn đi sau 10s nếu không có sự tương tác
+        QTimer::singleShot(10000, this, [=]() {
+            removeFromScene(proxyInviteWidget);
+            listG.removeAll(proxyInviteWidget);
+        });
+
+        connect(acceptButton, &Button::clicked, this, [=]() {
+            // clientManager->sendAcceptInvite(username);
+            clientManager->sendRespondInviteRequest("accept",user->getUsername(),username);
+            removeFromScene(proxyInviteWidget);
+            listG.removeAll(proxyInviteWidget);
+        });
+
+        connect(declineButton, &Button::clicked, this, [=]() {
+            clientManager->sendRespondInviteRequest("decline",user->getUsername(),username);
+            removeFromScene(proxyInviteWidget);
+            listG.removeAll(proxyInviteWidget);
+        });
     });
 }
 
@@ -625,10 +682,37 @@ void Game::displayWaitFindMatch() {
     });
 }
 
-void Game::displayRoom() {
+void Game::displayRoom(Player *player) {
     setBackground();
 
     clearScene();
+
+    // if (clientManager) {
+    //     clientManager->sendGetListPlayerRequest(user->getUsername());
+    // }
+
+    // Ngắt kết nối cũ trước khi thiết lập kết nối mới (tránh nhiều lần xử lý trùng lặp)
+    // disconnect(clientManager, &ClientManager::getListPlayerResult, this, nullptr);
+
+    connect(clientManager, &ClientManager::getListPlayerResult, this, [=](const QString &status, const QString &message, const QList<Player> &playerList) {
+        if (status == "success") {
+            qDeleteAll(players);
+            players.clear();
+            for (const Player &player : playerList) {
+                players.append(new Player(player));
+            }
+
+            for (QGraphicsItem *item : listG) {
+                removeFromScene(item);
+                delete item;
+            }
+            listG.clear();
+
+            createPlayerListView(players);
+        } else if (status == "failure") {
+            qDebug() << message;
+        }
+    });
 
     QGraphicsTextItem *titleText = new QGraphicsTextItem("CHESS PRO");
     QFont titleFont("arial", 50);
@@ -664,102 +748,144 @@ void Game::displayRoom() {
 
     QFont playerFont("Arial", 16);
 
-    QGraphicsTextItem *player1Name = new QGraphicsTextItem(user->getName());
+    QGraphicsTextItem *player1Name = new QGraphicsTextItem("");
     player1Name->setFont(playerFont);
     player1Name->setDefaultTextColor(Qt::red);
     player1Name->setPos(400, 315);
     addToScene(player1Name);
     listG.append(player1Name);
 
-    QString player1EloText = QString("Elo: %1").arg(user->getElo());
-    QGraphicsTextItem *player1Elo = new QGraphicsTextItem(player1EloText);
+    QGraphicsTextItem *player1Elo = new QGraphicsTextItem("");
     player1Elo->setFont(playerFont);
     player1Elo->setDefaultTextColor(Qt::black);
     player1Elo->setPos(400, 355);
     addToScene(player1Elo);
     listG.append(player1Elo);
 
-    // QGraphicsTextItem *player2Name = new QGraphicsTextItem("Player 2: Empty");
-    // player2Name->setFont(playerFont);
-    // player2Name->setDefaultTextColor(Qt::black);
-    // player2Name->setPos(400, 465);
-    // addToScene(player2Name);
-    // listG.append(player2Name);
+    QGraphicsTextItem *player2Name = new QGraphicsTextItem("");
+    player2Name->setFont(playerFont);
+    player2Name->setDefaultTextColor(Qt::black);
+    player2Name->setPos(400, 465);
+    addToScene(player2Name);
+    listG.append(player2Name);
 
-    // QGraphicsTextItem *player2Elo = new QGraphicsTextItem("Elo: Empty");
-    // player2Elo->setFont(playerFont);
-    // player2Elo->setDefaultTextColor(Qt::black);
-    // player2Elo->setPos(400, 505);
-    // addToScene(player2Elo);
-    // listG.append(player2Elo);
+    QGraphicsTextItem *player2Elo = new QGraphicsTextItem("");
+    player2Elo->setFont(playerFont);
+    player2Elo->setDefaultTextColor(Qt::black);
+    player2Elo->setPos(400, 505);
+    addToScene(player2Elo);
+    listG.append(player2Elo);
+
+    QGraphicsRectItem* lockBackground = new QGraphicsRectItem(350, 450, 300, 100);
+    lockBackground->setBrush(QBrush(Qt::black));
+    lockBackground->setOpacity(0);
+    addToScene(lockBackground);
+    listG.append(lockBackground);
+
+    QFont waitingFont("Arial", 36);
+
+    QGraphicsTextItem *waitingText = new QGraphicsTextItem("");
+    waitingText->setFont(waitingFont);
+    waitingText->setDefaultTextColor(Qt::white);
+    waitingText->setPos(500, 475);
+    addToScene(waitingText);
+    listG.append(waitingText);
+
+    if (player == nullptr) {
+        player1Name->setPlainText(user->getName());
+        QString player1EloText = QString("Elo: %1").arg(user->getElo());
+        player1Elo->setPlainText(player1EloText);
+        lockBackground->setOpacity(1);
+        waitingText->setPlainText("NONE");
+        waitingText->setPos(500 - waitingText->boundingRect().width()/2, 475);
+    } else {
+        player1Name->setPlainText(player->getName());
+        QString player1EloText = QString("Elo: %1").arg(player->getElo());
+        player1Elo->setPlainText(player1EloText);
+
+        player2Name->setPlainText(user->getName());
+        QString player2EloText = QString("Elo: %1").arg(user->getElo());
+        player2Elo->setPlainText(player2EloText);
+    }
 
     QGraphicsRectItem* listPlayerBackground = new QGraphicsRectItem(750, 299, 325, 342);
     listPlayerBackground->setBrush(QBrush(Qt::white));
     addToScene(listPlayerBackground);
     listG.append(listPlayerBackground);
 
-    // Scene riêng cho danh sách người chơi
-    QGraphicsScene *listPlayerScene = new QGraphicsScene();
-    int yOffset = 0;
+    // // Scene riêng cho danh sách người chơi
+    // QGraphicsScene *listPlayerScene = new QGraphicsScene();
+    // int yOffset = 0;
 
-    for (Player *player : players) {
-        // Tạo nhóm hiển thị
-        QGraphicsItemGroup *playerGroup = new QGraphicsItemGroup();
+    // for (Player *player : players) {
+    //     // Tạo nhóm hiển thị
+    //     QGraphicsItemGroup *playerGroup = new QGraphicsItemGroup();
 
-        // Tạo nền màu
-        QGraphicsRectItem *background = new QGraphicsRectItem(0, yOffset, 275, 75);
-        background->setBrush(QBrush(QColor(238, 238, 238)));
-        background->setPen(Qt::NoPen);
-        playerGroup->addToGroup(background);
+    //     // Tạo nền màu
+    //     QGraphicsRectItem *background = new QGraphicsRectItem(0, yOffset, 275, 75);
+    //     background->setBrush(QBrush(QColor(238, 238, 238)));
+    //     background->setPen(Qt::NoPen);
+    //     playerGroup->addToGroup(background);
 
-        QGraphicsTextItem *nameItem = new QGraphicsTextItem(player->getName(), background);
-        nameItem->setFont(QFont("Arial", 20, QFont::Bold));
-        nameItem->setDefaultTextColor(Qt::black);
-        nameItem->setPos(10, yOffset + 5);
-        playerGroup->addToGroup(nameItem);
+    //     QGraphicsTextItem *nameItem = new QGraphicsTextItem(player->getName(), background);
+    //     nameItem->setFont(QFont("Arial", 20, QFont::Bold));
+    //     nameItem->setDefaultTextColor(Qt::black);
+    //     nameItem->setPos(10, yOffset + 5);
+    //     playerGroup->addToGroup(nameItem);
 
-        // Hiển thị ELO người chơi
-        QString eloInfo =  "Elo: " + QString::number(player->getElo());
-        QGraphicsTextItem *eloItem = new QGraphicsTextItem(eloInfo, background);
-        eloItem->setFont(QFont("Arial", 15));
-        eloItem->setDefaultTextColor(Qt::red);
-        eloItem->setPos(15, yOffset + 45);
-        playerGroup->addToGroup(eloItem);
+    //     QString eloInfo =  "Elo: " + QString::number(player->getElo());
+    //     QGraphicsTextItem *eloItem = new QGraphicsTextItem(eloInfo, background);
+    //     eloItem->setFont(QFont("Arial", 15));
+    //     eloItem->setDefaultTextColor(Qt::black);
+    //     eloItem->setPos(15, yOffset + 45);
+    //     playerGroup->addToGroup(eloItem);
 
-        listPlayerScene->addItem(playerGroup);
+    //     QGraphicsTextItem *statusItem = new QGraphicsTextItem(player->getStatus(), background);
+    //     statusItem->setFont(QFont("Arial", 12));
+    //     if (player->getStatus() == "Online") {
+    //         statusItem->setDefaultTextColor(Qt::green);
+    //     } else if (player->getStatus() == "In Match") {
+    //         statusItem->setDefaultTextColor(Qt::red);
+    //     } else {
+    //         statusItem->setDefaultTextColor(Qt::yellow);
+    //     }
+    //     statusItem->setPos(150, yOffset + 30);
+    //     playerGroup->addToGroup(statusItem);
 
-        // Thêm nút "+" nếu người chơi đang Online
-        if (player->getStatus() == "Online") {
-            Button *addButton = new Button("+");
-            addButton->setRect(230, yOffset + 22.5, 30, 30);
-            addButton->alignText(230, yOffset + 22.5);
-            addButton->setObjectName(player->getName());
-            // addButton->setPos(300, yOffset); // Vị trí nút ở bên cạnh thông tin
-            connect(addButton, &Button::clicked, this, [player]() {
-                qDebug() << "Added player:" << player->getName();
-            });
-            listPlayerScene->addItem(addButton);
-        }
+    //     listPlayerScene->addItem(playerGroup);
 
-        yOffset += 85; // Tăng khoảng cách hiển thị giữa các người chơi
-    }
+    //     // Thêm nút "+" nếu người chơi đang Online
+    //     if (player->getStatus() == "Online") {
+    //         Button *addButton = new Button("+");
+    //         addButton->setRect(230, yOffset + 22.5, 30, 30);
+    //         addButton->alignText(230, yOffset + 22.5);
+    //         addButton->setObjectName(player->getName());
+    //         // addButton->setPos(300, yOffset); // Vị trí nút ở bên cạnh thông tin
+    //         connect(addButton, &Button::clicked, this, [player]() {
+    //             qDebug() << "Added player:" << player->getName();
+    //         });
+    //         listPlayerScene->addItem(addButton);
+    //     }
 
-    // Hiển thị danh sách người chơi trong QGraphicsView
-    QGraphicsView *listPlayerView = new QGraphicsView();
-    listPlayerView->setScene(listPlayerScene);
-    listPlayerView->setFixedSize(325, 340);
-    listPlayerView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-    listPlayerView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    listPlayerView->setStyleSheet("background-color: transparent; border: none;");
-    listPlayerView->setFrameStyle(QFrame::NoFrame);
+    //     yOffset += 85; // Tăng khoảng cách hiển thị giữa các người chơi
+    // }
 
-    QGraphicsProxyWidget *proxyWidget = new QGraphicsProxyWidget();
-    proxyWidget->setWidget(listPlayerView);
-    proxyWidget->setPos(750, 300);
-    addToScene(proxyWidget);
-    listG.append(proxyWidget);
+    // // Hiển thị danh sách người chơi trong QGraphicsView
+    // QGraphicsView *listPlayerView = new QGraphicsView();
+    // listPlayerView->setScene(listPlayerScene);
+    // listPlayerView->setFixedSize(325, 340);
+    // listPlayerView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+    // listPlayerView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    // listPlayerView->setStyleSheet("background-color: transparent; border: none;");
+    // listPlayerView->setFrameStyle(QFrame::NoFrame);
 
-    listPlayerView->verticalScrollBar()->setValue(0);
+    // QGraphicsProxyWidget *proxyWidget = new QGraphicsProxyWidget();
+    // proxyWidget->setWidget(listPlayerView);
+    // proxyWidget->setPos(750, 300);
+    // addToScene(proxyWidget);
+    // listG.append(proxyWidget);
+
+    // listPlayerView->verticalScrollBar()->setValue(0);
 
     // Nút Start (disabled ban đầu)
     Button *startButton = new Button("Start");
@@ -776,23 +902,78 @@ void Game::displayRoom() {
     addToScene(outButton);
     listG.append(outButton);
     connect(outButton, &Button::clicked, this, [=]() mutable {
+        disconnect(clientManager, &ClientManager::getListPlayerResult, this, nullptr);
         displayMenu("");
     });
+}
 
-    QGraphicsRectItem* lockBackground = new QGraphicsRectItem(350, 450, 300, 100);
-    lockBackground->setBrush(QBrush(Qt::black));
-    // lockBackground->setOpacity(0.8);
-    addToScene(lockBackground);
-    listG.append(lockBackground);
+void Game::createPlayerListView(const QList<Player *> &playerList) {
+    QGraphicsScene *listPlayerScene = new QGraphicsScene();
+    int yOffset = 0;
 
-    QFont waitingFont("Arial", 36);
+    for (Player *player : playerList) {
+        QGraphicsItemGroup *playerGroup = new QGraphicsItemGroup();
 
-    QGraphicsTextItem *waitingText = new QGraphicsTextItem("Waiting...");
-    waitingText->setFont(waitingFont);
-    waitingText->setDefaultTextColor(Qt::white);
-    waitingText->setPos(500 - waitingText->boundingRect().width()/2, 475);
-    addToScene(waitingText);
-    listG.append(waitingText);
+        QGraphicsRectItem *background = new QGraphicsRectItem(0, yOffset, 275, 75);
+        background->setBrush(QBrush(QColor(238, 238, 238)));
+        background->setPen(Qt::NoPen);
+        playerGroup->addToGroup(background);
+
+        QGraphicsTextItem *nameItem = new QGraphicsTextItem(player->getName(), background);
+        nameItem->setFont(QFont("Arial", 20, QFont::Bold));
+        nameItem->setDefaultTextColor(Qt::black);
+        nameItem->setPos(10, yOffset + 5);
+        playerGroup->addToGroup(nameItem);
+
+        QString eloInfo = "Elo: " + QString::number(player->getElo());
+        QGraphicsTextItem *eloItem = new QGraphicsTextItem(eloInfo, background);
+        eloItem->setFont(QFont("Arial", 15));
+        eloItem->setDefaultTextColor(Qt::black);
+        eloItem->setPos(15, yOffset + 45);
+        playerGroup->addToGroup(eloItem);
+
+        QGraphicsTextItem *statusItem = new QGraphicsTextItem(player->getStatus(), background);
+        statusItem->setFont(QFont("Arial", 12));
+        if (player->getStatus() == "Online") {
+            statusItem->setDefaultTextColor(Qt::green);
+        } else if (player->getStatus() == "In Match") {
+            statusItem->setDefaultTextColor(Qt::red);
+        } else {
+            statusItem->setDefaultTextColor(Qt::yellow);
+        }
+        statusItem->setPos(150, yOffset + 30);
+        playerGroup->addToGroup(statusItem);
+
+        listPlayerScene->addItem(playerGroup);
+
+        if (player->getStatus() == "Online") {
+            Button *addButton = new Button("+");
+            addButton->setRect(230, yOffset + 22.5, 30, 30);
+            connect(addButton, &Button::clicked, this, [player]() {
+                qDebug() << "Added player:" << player->getName();
+                if (clientManager) {
+                    clientManager->sendInvitePlayerRequest(user->getUsername(), user->getName(), player->getUsername());
+                }
+            });
+            listPlayerScene->addItem(addButton);
+        }
+
+        yOffset += 85;
+    }
+
+    QGraphicsView *listPlayerView = new QGraphicsView();
+    listPlayerView->setScene(listPlayerScene);
+    listPlayerView->setFixedSize(325, 340);
+    listPlayerView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+    listPlayerView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    listPlayerView->setStyleSheet("background-color: transparent; border: none;");
+    listPlayerView->setFrameStyle(QFrame::NoFrame);
+
+    QGraphicsProxyWidget *proxyWidget = new QGraphicsProxyWidget();
+    proxyWidget->setWidget(listPlayerView);
+    proxyWidget->setPos(750, 300);
+    addToScene(proxyWidget);
+    listG.append(proxyWidget);
 }
 
 extern ClientManager *clientManager;
