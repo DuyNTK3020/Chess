@@ -421,23 +421,23 @@ void Game::displayRegister() {
         if (clientManager) {
             clientManager->sendRegisterRequest(name, username, password);
         }
+
+        connect(clientManager, &ClientManager::registerResult, this, [=](const QString &status, const QString &message) {
+            qDebug() << message;
+            if (status == "success") {
+                logText->setPlainText(message);
+                logText->setDefaultTextColor(Qt::green);
+                logText->setPos(width()/2 - logText->boundingRect().width()/2, 700);
+            } else if (status == "failure") {
+                logText->setPlainText(message);
+                logText->setDefaultTextColor(Qt::red);
+                logText->setPos(width()/2 - logText->boundingRect().width()/2, 700);
+            }
+        });
     });
 
     connect(loginButton, &Button::clicked, this, [=]() {
         displayLogin();
-    });
-
-    connect(clientManager, &ClientManager::registerResult, this, [=](const QString &status, const QString &message) {
-        qDebug() << message;
-        if (status == "success") {
-            logText->setPlainText(message);
-            logText->setDefaultTextColor(Qt::green);
-            logText->setPos(width()/2 - logText->boundingRect().width()/2, 700);
-        } else if (status == "failure") {
-            logText->setPlainText(message);
-            logText->setDefaultTextColor(Qt::red);
-            logText->setPos(width()/2 - logText->boundingRect().width()/2, 700);
-        }
     });
 }
 
@@ -602,7 +602,7 @@ void Game::displayWaitFindMatch() {
     int *counter = new int(0);
 
     connect(timer, &QTimer::timeout, this, [=]() mutable {
-        if (*counter < 5) {
+        if (*counter < 300) {
             *counter += 1;
             logText->setPlainText(QString("Waiting Find Match... %1").arg(*counter));
             logText->setPos(width()/2 - logText->boundingRect().width()/2, 350);
@@ -630,23 +630,17 @@ void Game::displayRoom() {
 
     clearScene();
 
-    QGraphicsTextItem *titleText = new QGraphicsTextItem("Room");
+    QGraphicsTextItem *titleText = new QGraphicsTextItem("CHESS PRO");
     QFont titleFont("arial", 50);
     titleText->setFont(titleFont);
+    titleText->setDefaultTextColor(Qt::white);
     int xPos = width()/2 - titleText->boundingRect().width()/2;
     int yPos = 150;
     titleText->setPos(xPos, yPos);
     addToScene(titleText);
     listG.append(titleText);
 
-    QGraphicsTextItem *errorText = new QGraphicsTextItem("");
-    errorText->setDefaultTextColor(Qt::red);
-    errorText->setPos(width()/2, 450);
-    addToScene(errorText);
-    listG.append(errorText);
-
-    // Hiển thị thông tin người chơi trong phòng
-    QGraphicsRectItem* player1Background = new QGraphicsRectItem(350, 250, 300, 100);
+    QGraphicsRectItem* player1Background = new QGraphicsRectItem(350, 300, 300, 100);
     player1Background->setBrush(QBrush(Qt::white));
     addToScene(player1Background);
     listG.append(player1Background);
@@ -656,36 +650,50 @@ void Game::displayRoom() {
     addToScene(player2Background);
     listG.append(player2Background);
 
-    QFont playerFont("arial", 15);
-    QGraphicsTextItem *player1Name = new QGraphicsTextItem("Player 1: Empty");
+    QGraphicsPixmapItem *p = new QGraphicsPixmapItem();
+    p->setPixmap(QPixmap(":/images/king1.png"));
+    p->setPos(575,320);
+    addToScene(p);
+    listG.append(p);
+
+    QGraphicsPixmapItem *p1 = new QGraphicsPixmapItem();
+    p1->setPixmap(QPixmap(":/images/king.png"));
+    p1->setPos(575,470);
+    addToScene(p1);
+    listG.append(p1);
+
+    QFont playerFont("Arial", 16);
+
+    QGraphicsTextItem *player1Name = new QGraphicsTextItem(user->getName());
     player1Name->setFont(playerFont);
-    player1Name->setDefaultTextColor(Qt::black);
-    player1Name->setPos(400, 265);
+    player1Name->setDefaultTextColor(Qt::red);
+    player1Name->setPos(400, 315);
     addToScene(player1Name);
     listG.append(player1Name);
 
-    QGraphicsTextItem *player1Elo = new QGraphicsTextItem("Elo: Empty");
+    QString player1EloText = QString("Elo: %1").arg(user->getElo());
+    QGraphicsTextItem *player1Elo = new QGraphicsTextItem(player1EloText);
     player1Elo->setFont(playerFont);
-    player1Elo->setDefaultTextColor(Qt::red);
-    player1Elo->setPos(400, 305);
+    player1Elo->setDefaultTextColor(Qt::black);
+    player1Elo->setPos(400, 355);
     addToScene(player1Elo);
     listG.append(player1Elo);
 
-    QGraphicsTextItem *player2Name = new QGraphicsTextItem("Player 2: Empty");
-    player2Name->setFont(playerFont);
-    player2Name->setDefaultTextColor(Qt::black);
-    player2Name->setPos(400, 465);
-    addToScene(player2Name);
-    listG.append(player2Name);
+    // QGraphicsTextItem *player2Name = new QGraphicsTextItem("Player 2: Empty");
+    // player2Name->setFont(playerFont);
+    // player2Name->setDefaultTextColor(Qt::black);
+    // player2Name->setPos(400, 465);
+    // addToScene(player2Name);
+    // listG.append(player2Name);
 
-    QGraphicsTextItem *player2Elo = new QGraphicsTextItem("Elo: Empty");
-    player2Elo->setFont(playerFont);
-    player2Elo->setDefaultTextColor(Qt::red);
-    player2Elo->setPos(400, 505);
-    addToScene(player2Elo);
-    listG.append(player2Elo);
+    // QGraphicsTextItem *player2Elo = new QGraphicsTextItem("Elo: Empty");
+    // player2Elo->setFont(playerFont);
+    // player2Elo->setDefaultTextColor(Qt::black);
+    // player2Elo->setPos(400, 505);
+    // addToScene(player2Elo);
+    // listG.append(player2Elo);
 
-    QGraphicsRectItem* listPlayerBackground = new QGraphicsRectItem(750, 249, 302, 300);
+    QGraphicsRectItem* listPlayerBackground = new QGraphicsRectItem(750, 299, 325, 342);
     listPlayerBackground->setBrush(QBrush(Qt::white));
     addToScene(listPlayerBackground);
     listG.append(listPlayerBackground);
@@ -699,23 +707,23 @@ void Game::displayRoom() {
         QGraphicsItemGroup *playerGroup = new QGraphicsItemGroup();
 
         // Tạo nền màu
-        QGraphicsRectItem *background = new QGraphicsRectItem(0, yOffset, 275, 50);
+        QGraphicsRectItem *background = new QGraphicsRectItem(0, yOffset, 275, 75);
         background->setBrush(QBrush(QColor(238, 238, 238)));
         background->setPen(Qt::NoPen);
         playerGroup->addToGroup(background);
 
         QGraphicsTextItem *nameItem = new QGraphicsTextItem(player->getName(), background);
-        nameItem->setFont(QFont("Arial", 16, QFont::Bold));
-        nameItem->setDefaultTextColor(Qt::white);
-        nameItem->setPos(10, yOffset);
+        nameItem->setFont(QFont("Arial", 20, QFont::Bold));
+        nameItem->setDefaultTextColor(Qt::black);
+        nameItem->setPos(10, yOffset + 5);
         playerGroup->addToGroup(nameItem);
 
         // Hiển thị ELO người chơi
-        QString eloInfo = QString::number(player->getElo()) + " pts";
+        QString eloInfo =  "Elo: " + QString::number(player->getElo());
         QGraphicsTextItem *eloItem = new QGraphicsTextItem(eloInfo, background);
-        eloItem->setFont(QFont("Arial", 14));
-        eloItem->setDefaultTextColor(Qt::white);
-        eloItem->setPos(10, yOffset + 25);
+        eloItem->setFont(QFont("Arial", 15));
+        eloItem->setDefaultTextColor(Qt::red);
+        eloItem->setPos(15, yOffset + 45);
         playerGroup->addToGroup(eloItem);
 
         listPlayerScene->addItem(playerGroup);
@@ -723,8 +731,8 @@ void Game::displayRoom() {
         // Thêm nút "+" nếu người chơi đang Online
         if (player->getStatus() == "Online") {
             Button *addButton = new Button("+");
-            addButton->setRect(230, yOffset + 10, 30, 30);
-            addButton->alignText(230, yOffset + 10);
+            addButton->setRect(230, yOffset + 22.5, 30, 30);
+            addButton->alignText(230, yOffset + 22.5);
             addButton->setObjectName(player->getName());
             // addButton->setPos(300, yOffset); // Vị trí nút ở bên cạnh thông tin
             connect(addButton, &Button::clicked, this, [player]() {
@@ -733,13 +741,13 @@ void Game::displayRoom() {
             listPlayerScene->addItem(addButton);
         }
 
-        yOffset += 60; // Tăng khoảng cách hiển thị giữa các người chơi
+        yOffset += 85; // Tăng khoảng cách hiển thị giữa các người chơi
     }
 
     // Hiển thị danh sách người chơi trong QGraphicsView
     QGraphicsView *listPlayerView = new QGraphicsView();
     listPlayerView->setScene(listPlayerScene);
-    listPlayerView->setFixedSize(300, 300); // Kích thước của view
+    listPlayerView->setFixedSize(325, 340);
     listPlayerView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
     listPlayerView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     listPlayerView->setStyleSheet("background-color: transparent; border: none;");
@@ -747,7 +755,7 @@ void Game::displayRoom() {
 
     QGraphicsProxyWidget *proxyWidget = new QGraphicsProxyWidget();
     proxyWidget->setWidget(listPlayerView);
-    proxyWidget->setPos(750, 250);
+    proxyWidget->setPos(750, 300);
     addToScene(proxyWidget);
     listG.append(proxyWidget);
 
@@ -764,7 +772,7 @@ void Game::displayRoom() {
     listG.append(startButton);
 
     Button *outButton = new Button("Out");
-    outButton->setPos(300, 50);
+    outButton->setPos(0, 0);
     addToScene(outButton);
     listG.append(outButton);
     connect(outButton, &Button::clicked, this, [=]() mutable {
@@ -773,9 +781,18 @@ void Game::displayRoom() {
 
     QGraphicsRectItem* lockBackground = new QGraphicsRectItem(350, 450, 300, 100);
     lockBackground->setBrush(QBrush(Qt::black));
-    lockBackground->setOpacity(0.8);
+    // lockBackground->setOpacity(0.8);
     addToScene(lockBackground);
     listG.append(lockBackground);
+
+    QFont waitingFont("Arial", 36);
+
+    QGraphicsTextItem *waitingText = new QGraphicsTextItem("Waiting...");
+    waitingText->setFont(waitingFont);
+    waitingText->setDefaultTextColor(Qt::white);
+    waitingText->setPos(500 - waitingText->boundingRect().width()/2, 475);
+    addToScene(waitingText);
+    listG.append(waitingText);
 }
 
 extern ClientManager *clientManager;
@@ -944,6 +961,14 @@ void Game::displayProfile()
             errorText->setPlainText(message);
             errorText->setPos(width()/2 - errorText->boundingRect().width()/2, 800);
         }
+    });
+
+    Button *outButton = new Button("Out");
+    outButton->setPos(0, 0);
+    addToScene(outButton);
+    listG.append(outButton);
+    connect(outButton, &Button::clicked, this, [=]() mutable {
+        displayMenu("");
     });
 }
 
