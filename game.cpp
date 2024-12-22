@@ -827,6 +827,11 @@ void Game::displayRoom(Player &player) {
     listG.append(outButton);
     connect(outButton, &Button::clicked, this, [=]() mutable {
         disconnect(clientManager, &ClientManager::getListPlayerResult, this, nullptr);
+        for (QGraphicsItem *item : listPlayerItems) {
+            removeFromScene(item);
+            delete item;
+        }
+        listPlayerItems.clear();
         displayMenu("");
     });
 
