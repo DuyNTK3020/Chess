@@ -43,7 +43,7 @@ public:
     void displayWaitConnect();
     void displayMenu(const QString &logText);
     void displayWaitFindMatch();
-    void displayRoom(Player *player);
+    void displayRoom(Player &player);
     void displayProfile();
 
     void clearInvitation(QGraphicsTextItem *inviteText, Button *acceptButton, Button *declineButton);

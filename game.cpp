@@ -568,7 +568,8 @@ void Game::displayMenu(const QString &logTextResult) {
 
     connect(clientManager, &ClientManager::createRoomResult, this, [=](const QString &status, const QString &message) {
         if (status == "success") {
-            displayRoom(nullptr);
+            Player emptyPlayer;
+            displayRoom(emptyPlayer);
         } else if (status == "failure") {
             logText->setPlainText(message);
             logText->setPos(width()/2 - logText->boundingRect().width()/2, btnYPos + 300);
@@ -611,12 +612,12 @@ void Game::displayMenu(const QString &logTextResult) {
 
         // Tạo bộ đếm thời gian để ẩn đi sau 10s nếu không có sự tương tác
         QTimer::singleShot(10000, this, [=]() {
+            clientManager->sendRespondInviteRequest("decline",user->getUsername(),username);
             removeFromScene(proxyInviteWidget);
             listG.removeAll(proxyInviteWidget);
         });
 
         connect(acceptButton, &Button::clicked, this, [=]() {
-            // clientManager->sendAcceptInvite(username);
             clientManager->sendRespondInviteRequest("accept",user->getUsername(),username);
             removeFromScene(proxyInviteWidget);
             listG.removeAll(proxyInviteWidget);
@@ -627,6 +628,25 @@ void Game::displayMenu(const QString &logTextResult) {
             removeFromScene(proxyInviteWidget);
             listG.removeAll(proxyInviteWidget);
         });
+    });
+
+    connect(clientManager, &ClientManager::createRoomResult, this, [=](const QString &status, const QString &message) {
+        if (status == "success") {
+            Player emptyPlayer;
+            displayRoom(emptyPlayer);
+        } else if (status == "failure") {
+            logText->setPlainText(message);
+            logText->setPos(width()/2 - logText->boundingRect().width()/2, btnYPos + 300);
+        }
+    });
+
+    connect(clientManager, &ClientManager::respondInviteResult, this, [=](const QString &status, const QString &message, Player &player) {
+        if (status == "success") {
+            displayRoom(player);
+        } else if (status == "failure") {
+            logText->setPlainText(message);
+            logText->setPos(width()/2 - logText->boundingRect().width()/2, btnYPos + 300);
+        }
     });
 }
 
@@ -682,7 +702,7 @@ void Game::displayWaitFindMatch() {
     });
 }
 
-void Game::displayRoom(Player *player) {
+void Game::displayRoom(Player &player) {
     setBackground();
 
     clearScene();
@@ -791,7 +811,7 @@ void Game::displayRoom(Player *player) {
     addToScene(waitingText);
     listG.append(waitingText);
 
-    if (player == nullptr) {
+    if (player.getName().isEmpty() && player.getUsername().isEmpty()) {
         player1Name->setPlainText(user->getName());
         QString player1EloText = QString("Elo: %1").arg(user->getElo());
         player1Elo->setPlainText(player1EloText);
@@ -799,8 +819,8 @@ void Game::displayRoom(Player *player) {
         waitingText->setPlainText("NONE");
         waitingText->setPos(500 - waitingText->boundingRect().width()/2, 475);
     } else {
-        player1Name->setPlainText(player->getName());
-        QString player1EloText = QString("Elo: %1").arg(player->getElo());
+        player1Name->setPlainText(player.getName());
+        QString player1EloText = QString("Elo: %1").arg(player.getElo());
         player1Elo->setPlainText(player1EloText);
 
         player2Name->setPlainText(user->getName());

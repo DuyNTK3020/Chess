@@ -125,6 +125,16 @@ void ClientManager::onReadyRead()
             QString name = jsonObj["name"].toString();
             emit invitePlayerResult(username, name);
         }
+        if (jsonObj.contains("type") && jsonObj["type"].toString() == "respond_invite_ack") {
+            QString status = jsonObj["status"].toString();
+            QString message = jsonObj["message"].toString();
+            Player user;
+            if (jsonObj.contains("user") && jsonObj["user"].isObject()) {
+                QJsonObject userObj = jsonObj["user"].toObject();
+                user = Player(userObj);
+            }
+            emit respondInviteResult(status, message, user);
+        }
     }
 }
 
