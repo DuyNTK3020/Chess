@@ -29,9 +29,9 @@ int main(int argc, char *argv[])
     // Khởi tạo game
     game = new Game();
     game->show();
-    // game->displayLogin();
+    game->displayLogin();
     // game->displayRoom(nullptr);
-    game->displayMenu("");
+    // game->displayMenu("");
 
     return a.exec();
 }
