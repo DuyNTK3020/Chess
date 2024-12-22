@@ -15,7 +15,7 @@ public:
     void sendMove(const QString &game_id, const QString &username,int oldRow, int oldCol, int newRow, int newCol);
     void sendRegisterRequest(const QString &name, const QString &username, const QString &password);
     void sendLoginRequest(const QString &username, const QString &password);
-    void sendConnectRequest(const QString &token);
+    void sendConnectRequest(const QString &token, const QString &username);
     void sendFindMatchRequest(const QString &username);
     void sendCreateRoomRequest(const QString &username);
     void sendUpdateProfileRequest(const QString &username, const QString &name);

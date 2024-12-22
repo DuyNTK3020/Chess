@@ -181,11 +181,12 @@ void ClientManager::sendLoginRequest(const QString &username, const QString &pas
     }
 }
 
-void ClientManager::sendConnectRequest(const QString &token)
+void ClientManager::sendConnectRequest(const QString &token, const QString &username)
 {
     QJsonObject json;
     json["type"] = "connect";
     json["token"] = token;
+    json["username"] = username;
 
     QJsonDocument doc(json);
     QByteArray data = doc.toJson(QJsonDocument::Compact);

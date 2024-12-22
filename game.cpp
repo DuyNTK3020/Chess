@@ -466,7 +466,7 @@ void Game::displayWaitConnect() {
     listG.append(logText);
 
     if (clientManager) {
-        clientManager->sendConnectRequest(user->getToken());
+        clientManager->sendConnectRequest(user->getToken(), user->getUsername());
     }
 
     QTimer *timer = new QTimer(this);
