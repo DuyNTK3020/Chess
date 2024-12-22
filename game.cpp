@@ -707,32 +707,8 @@ void Game::displayRoom(Player &player) {
 
     clearScene();
 
-    // if (clientManager) {
-    //     clientManager->sendGetListPlayerRequest(user->getUsername());
-    // }
-
     // Ngắt kết nối cũ trước khi thiết lập kết nối mới (tránh nhiều lần xử lý trùng lặp)
     // disconnect(clientManager, &ClientManager::getListPlayerResult, this, nullptr);
-
-    connect(clientManager, &ClientManager::getListPlayerResult, this, [=](const QString &status, const QString &message, const QList<Player> &playerList) {
-        if (status == "success") {
-            qDeleteAll(players);
-            players.clear();
-            for (const Player &player : playerList) {
-                players.append(new Player(player));
-            }
-
-            for (QGraphicsItem *item : listG) {
-                removeFromScene(item);
-                delete item;
-            }
-            listG.clear();
-
-            createPlayerListView(players);
-        } else if (status == "failure") {
-            qDebug() << message;
-        }
-    });
 
     QGraphicsTextItem *titleText = new QGraphicsTextItem("CHESS PRO");
     QFont titleFont("arial", 50);
@@ -924,6 +900,26 @@ void Game::displayRoom(Player &player) {
     connect(outButton, &Button::clicked, this, [=]() mutable {
         disconnect(clientManager, &ClientManager::getListPlayerResult, this, nullptr);
         displayMenu("");
+    });
+
+    connect(clientManager, &ClientManager::getListPlayerResult, this, [=](const QString &status, const QString &message, const QList<Player> &playerList) {
+        if (status == "success") {
+            qDeleteAll(players);
+            players.clear();
+            for (const Player &player : playerList) {
+                players.append(new Player(player));
+            }
+
+            for (QGraphicsItem *item : listG) {
+                removeFromScene(item);
+                delete item;
+            }
+            listG.clear();
+
+            createPlayerListView(players);
+        } else if (status == "failure") {
+            qDebug() << message;
+        }
     });
 }
 
