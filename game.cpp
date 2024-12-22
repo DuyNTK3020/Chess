@@ -898,6 +898,7 @@ void Game::createPlayerListView(const QList<Player *> &playerList) {
         if (player->getStatus() == "Online") {
             Button *addButton = new Button("+");
             addButton->setRect(230, yOffset + 22.5, 30, 30);
+            addButton->alignText(230, yOffset + 22.5);
             connect(addButton, &Button::clicked, this, [player]() {
                 qDebug() << "Added player:" << player->getName();
                 if (clientManager) {
