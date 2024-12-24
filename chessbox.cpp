@@ -87,7 +87,11 @@ void ChessBox::mousePressEvent(QGraphicsSceneMouseEvent *event)
             game->changeTurn();
             checkForCheck();
 
+            // ChessBox *oldBox = game->collection[1][1];
+            // ChessBox *newBox = game->collection[2][1];
 
+            // oldBox->updateOpponentMove(oldBox,newBox);
+            //updateOpponentMove(1,1,2,1);
 
         }
         //Selecting couterpart of the chessPiece
@@ -97,22 +101,22 @@ void ChessBox::mousePressEvent(QGraphicsSceneMouseEvent *event)
         }
 }
 
-void ChessBox::updateOpponentMove(){
-    qDebug() << "Test xem như nào:" << game->collection[1][1]->currentPiece->getSide();
+void ChessBox::updateOpponentMove(int old_col,int old_row, int new_col,int new_row){
+    //qDebug() << "Test xem như nào:" << game->collection[1][1]->currentPiece->getSide();
 
-    ChessBox *oldBox = game->collection[1][1];
-    ChessBox *newBox = game->collection[2][1];
+    ChessBox *oldBox = game->collection[old_row][old_col];
+    ChessBox *newBox = game->collection[new_row][new_col];
 
-    qDebug() << "OldBox Address:" << oldBox;
-    qDebug() << "NewBox Address:" << newBox;
+    //qDebug() << "OldBox Address:" << oldBox;
+    //qDebug() << "NewBox Address:" << newBox;
 
     if (!oldBox || !newBox) {
         qDebug() << "Error: One of the boxes is NULL!";
         return;
     }
 
-    qDebug() << "OldBox Position:" << oldBox->getPosition();
-    qDebug() << "NewBox Position:" << newBox->getPosition();
+    //qDebug() << "OldBox Position:" << oldBox->getPosition();
+    //qDebug() << "NewBox Position:" << newBox->getPosition();
 
     ChessPiece *piece = oldBox->currentPiece;
 
@@ -123,28 +127,28 @@ void ChessBox::updateOpponentMove(){
         return;
     }
 
-    qDebug() << "Piece Side:" << piece->getSide();
+    //qDebug() << "Piece Side:" << piece->getSide();
 
     // Update oldBox
-    qDebug() << "Setting oldBox hasChessPiece to false...";
+    //qDebug() << "Setting oldBox hasChessPiece to false...";
     oldBox->setHasChessPiece(false);
     oldBox->currentPiece = NULL;
 
-    qDebug() << "oldBox hasChessPiece after update:" << oldBox->getHasChessPiece();
+    //qDebug() << "oldBox hasChessPiece after update:" << oldBox->getHasChessPiece();
     //qDebug() << "oldBox currentPiece after update:" << oldBox->currentPiece;
 
     // Update newBox
-    qDebug() << "Setting newBox hasChessPiece to true...";
+    //qDebug() << "Setting newBox hasChessPiece to true...";
     //newBox->setHasChessPiece(true, piece);
-    qDebug() << "newBox hasChessPiece after update:" << newBox->getHasChessPiece();
+    //qDebug() << "newBox hasChessPiece after update:" << newBox->getHasChessPiece();
 
     //newBox->currentPiece = piece;
     //qDebug() << "newBox currentPiece after update:" << newBox->currentPiece;
 
     // Update piece
-    qDebug() << "Updating piece's currentBox...";
+    //qDebug() << "Updating piece's currentBox...";
     //piece->setCurrentBox(newBox);
-    qDebug() << "Piece's currentBox after update:" << piece->getCurrentBox()->getPosition();
+    //qDebug() << "Piece's currentBox after update:" << piece->getCurrentBox()->getPosition();
     if(newBox->getHasChessPiece()){
         newBox->currentPiece->setIsPlaced(false);
         newBox->currentPiece->setCurrentBox(NULL);
@@ -159,6 +163,7 @@ void ChessBox::updateOpponentMove(){
     game->changeTurn();
     checkForCheck();
 }
+
 
 
 

@@ -6,6 +6,13 @@
 #include <QDebug>
 #include <QJsonArray>
 #include <QJsonObject>
+#include <chessbox.h>
+#include "game.h"
+
+extern Game *game;
+
+ChessBox *oldBox;
+
 
 ClientManager::ClientManager(QObject *parent) : QObject(parent), socket(new QTcpSocket(this))
 {
@@ -66,6 +73,18 @@ void ClientManager::onReadyRead()
             QString message = jsonObj["message"].toString();
             // qDebug() << "Register " << status << ": " << message;
             emit registerResult(status, message);
+        }
+        if (jsonObj.contains("type") && jsonObj["type"].toString() == "move") {
+            int old_row = jsonObj["old_row"].toInt();
+            int old_col = jsonObj["old_col"].toInt();
+            int new_row = jsonObj["new_row"].toInt();
+            int new_col = jsonObj["new_col"].toInt();
+            qDebug() << old_row << " " << old_col << " " << new_row << " " <<new_col;
+
+            oldBox->updateOpponentMove(old_col, old_row, new_col,new_row);
+
+            // qDebug() << "Register " << status << ": " << message;
+            emit moveCoordinate(old_row, old_col, new_row, new_col);
         }
         if (jsonObj.contains("type") && jsonObj["type"].toString() == "login_ack") {
             QString status = jsonObj["status"].toString();

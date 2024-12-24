@@ -36,6 +36,7 @@ signals:
     void getListPlayerResult(const QString &status, const QString &message, const QList<Player> &players);
     void invitePlayerResult(const QString &username, const QString &name);
     void respondInviteResult(const QString &status, const QString &message, Player &player);
+    void moveCoordinate(int old_row,int old_col,int new_row,int new_col);
 
 private slots:
     void onReadyRead();

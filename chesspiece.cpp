@@ -54,7 +54,7 @@ ChessBox *ChessPiece::getCurrentBox()
 
 QString ChessPiece::getSide()
 {
-    qDebug() << "Đang lấy side của ChessPiece:" << side;
+    //qDebug() << "Đang lấy side của ChessPiece:" << side;
     return side;
 }
 
