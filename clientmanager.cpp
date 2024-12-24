@@ -136,6 +136,16 @@ void ClientManager::onReadyRead()
             }
             emit respondInviteResult(status, message, user);
         }
+        if (jsonObj.contains("type") && jsonObj["type"].toString() == "invitation_ack") {
+            QString status = jsonObj["status"].toString();
+            QString message = jsonObj["message"].toString();
+            Player user;
+            if (jsonObj.contains("user") && jsonObj["user"].isObject()) {
+                QJsonObject userObj = jsonObj["user"].toObject();
+                user = Player(userObj);
+            }
+            emit invitationResult(status, message, user);
+        }
     }
 }
 

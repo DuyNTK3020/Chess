@@ -15,6 +15,7 @@
 #include <QGraphicsProxyWidget>
 #include <QScrollBar>
 #include <QTimer>
+#include <QFontMetrics>
 
 
 QString Game::role = ""; // Khởi tạo giá trị mặc định
@@ -745,6 +746,10 @@ void Game::displayRoom(Player &player) {
 
     QFont playerFont("Arial", 16);
 
+    QFontMetrics metrics(QFont("Arial", 16));
+
+    // QGraphicsTextItem *nameItem = new QGraphicsTextItem(metrics.elidedText(player->getName(), Qt::ElideRight, 200), background);
+
     QGraphicsTextItem *player1Name = new QGraphicsTextItem("");
     player1Name->setFont(playerFont);
     player1Name->setDefaultTextColor(Qt::red);
@@ -789,18 +794,18 @@ void Game::displayRoom(Player &player) {
     listG.append(waitingText);
 
     if (player.getName().isEmpty() && player.getUsername().isEmpty()) {
-        player1Name->setPlainText(user->getName());
+        player1Name->setPlainText(metrics.elidedText(user->getName(), Qt::ElideRight, 200));
         QString player1EloText = QString("Elo: %1").arg(user->getElo());
         player1Elo->setPlainText(player1EloText);
         lockBackground->setOpacity(1);
         waitingText->setPlainText("NONE");
         waitingText->setPos(500 - waitingText->boundingRect().width()/2, 475);
     } else {
-        player1Name->setPlainText(player.getName());
+        player1Name->setPlainText(metrics.elidedText(player.getName(), Qt::ElideRight, 200));
         QString player1EloText = QString("Elo: %1").arg(player.getElo());
         player1Elo->setPlainText(player1EloText);
 
-        player2Name->setPlainText(user->getName());
+        player2Name->setPlainText(metrics.elidedText(user->getName(), Qt::ElideRight, 200));
         QString player2EloText = QString("Elo: %1").arg(user->getElo());
         player2Elo->setPlainText(player2EloText);
 
@@ -840,13 +845,34 @@ void Game::displayRoom(Player &player) {
         displayMenu("");
     });
 
-    Button *testButton = new Button("Test");
-    testButton->setPos(0, 200);
-    addToScene(testButton);
-    listG.append(testButton);
-    connect(testButton, &Button::clicked, this, [=]() mutable {
+    // Button *testButton = new Button("Test");
+    // testButton->setPos(0, 200);
+    // addToScene(testButton);
+    // listG.append(testButton);
+    // connect(testButton, &Button::clicked, this, [=]() mutable {
+    //     if (clientManager) {
+    //         clientManager->sendGetListPlayerRequest(user->getUsername());
+    //     }
+    // });
+
+    connect(clientManager, &ClientManager::invitationResult, this, [=](const QString &status, const QString &message, Player &player) {
+        if (status == "success") {
+            player2Name->setPlainText(metrics.elidedText(player.getName(), Qt::ElideRight, 200));
+            QString player2EloText = QString("Elo: %1").arg(player.getElo());
+            player2Elo->setPlainText(player2EloText);
+
+            lockBackground->setOpacity(0);
+            waitingText->setPlainText("");
+            waitingText->setPos(500 - waitingText->boundingRect().width()/2, 475);
+            startButton->setEnabled(true);
+        } else {
+            waitingText->setPlainText(message);
+            waitingText->setPos(500 - waitingText->boundingRect().width()/2, 475);
+        }
         if (clientManager) {
-            clientManager->sendGetListPlayerRequest(user->getUsername());
+            QTimer::singleShot(0, this, [=]() {
+                clientManager->sendGetListPlayerRequest(user->getUsername());
+            });
         }
     });
 
@@ -869,6 +895,12 @@ void Game::displayRoom(Player &player) {
             qDebug() << message;
         }
     });
+
+    if (clientManager) {
+        QTimer::singleShot(0, this, [=]() {
+            clientManager->sendGetListPlayerRequest(user->getUsername());
+        });
+    }
 }
 
 void Game::createPlayerListView(const QList<Player *> &playerList) {
@@ -883,7 +915,9 @@ void Game::createPlayerListView(const QList<Player *> &playerList) {
         background->setPen(Qt::NoPen);
         playerGroup->addToGroup(background);
 
-        QGraphicsTextItem *nameItem = new QGraphicsTextItem(player->getName(), background);
+        QFontMetrics metrics(QFont("Arial", 20, QFont::Bold));
+
+        QGraphicsTextItem *nameItem = new QGraphicsTextItem(metrics.elidedText(player->getName(), Qt::ElideRight, 200), background);
         nameItem->setFont(QFont("Arial", 20, QFont::Bold));
         nameItem->setDefaultTextColor(Qt::black);
         nameItem->setPos(10, yOffset + 5);
@@ -905,7 +939,7 @@ void Game::createPlayerListView(const QList<Player *> &playerList) {
         } else {
             statusItem->setDefaultTextColor(Qt::yellow);
         }
-        statusItem->setPos(150, yOffset + 30);
+        statusItem->setPos(160, yOffset + 45);
         playerGroup->addToGroup(statusItem);
 
         listPlayerScene->addItem(playerGroup);

@@ -37,6 +37,8 @@ signals:
     void getListPlayerResult(const QString &status, const QString &message, const QList<Player> &players);
     void invitePlayerResult(const QString &username, const QString &name);
     void respondInviteResult(const QString &status, const QString &message, Player &player);
+    void invitationResult(const QString &status, const QString &message, Player &player);
+
 
 private slots:
     void onReadyRead();
