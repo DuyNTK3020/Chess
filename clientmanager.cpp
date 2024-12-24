@@ -326,3 +326,21 @@ void ClientManager::sendRespondInviteRequest(const QString &status, const QStrin
         qDebug() << "Socket not writable!";
     }
 }
+
+void ClientManager::sendOutRoomRequest(const QString &status, const QString &username) {
+    QJsonObject json;
+    json["type"] = "out_room";
+    json["status"] = status;
+    json["username"] = username;
+
+    QJsonDocument doc(json);
+    QByteArray data = doc.toJson(QJsonDocument::Compact);
+
+    if (socket && socket->isWritable()) {
+        socket->write(data);
+        socket->flush();
+        qDebug() << "Sent connect request:" << data;
+    } else {
+        qDebug() << "Socket not writable!";
+    }
+}

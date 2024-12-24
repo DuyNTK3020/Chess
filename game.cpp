@@ -304,7 +304,7 @@ void Game::displayLogin() {
                 user->setElo(elo);
                 displayWaitConnect();
 
-            } else if (status == "failure") {
+            } else if (status == "failed") {
                 errorText->setPlainText(message);
                 errorText->setPos(width()/2 - errorText->boundingRect().width()/2, 700);
             }
@@ -428,11 +428,11 @@ void Game::displayRegister() {
             if (status == "success") {
                 logText->setPlainText(message);
                 logText->setDefaultTextColor(Qt::green);
-                logText->setPos(width()/2 - logText->boundingRect().width()/2, 700);
-            } else if (status == "failure") {
+                logText->setPos(width()/2 - logText->boundingRect().width()/2, 750);
+            } else if (status == "failed") {
                 logText->setPlainText(message);
                 logText->setDefaultTextColor(Qt::red);
-                logText->setPos(width()/2 - logText->boundingRect().width()/2, 700);
+                logText->setPos(width()/2 - logText->boundingRect().width()/2, 750);
             }
         });
     });
@@ -491,10 +491,10 @@ void Game::displayWaitConnect() {
 
         if (status == "success") {
             displayMenu("");
-        } else if (status == "failure") {
+        } else if (status == "failed") {
             logText->setPlainText(message);
             logText->setDefaultTextColor(Qt::red);
-            logText->setPos(width()/2 - logText->boundingRect().width()/2, 350);
+            logText->setPos(width()/2 - logText->boundingRect().width()/2, 700);
 
             Button *loginButton = new Button("Back to Login");
             loginButton->setPos(width()/2 - loginButton->boundingRect().width()/2, 500);
@@ -834,6 +834,11 @@ void Game::displayRoom(Player &player) {
         listPlayerItems.clear();
         displayMenu("");
     });
+
+    // if (clientManager) {
+    //     clientManager->sendGetListPlayerRequest(user->getUsername());
+    // }
+
 
     connect(clientManager, &ClientManager::getListPlayerResult, this, [=](const QString &status, const QString &message, const QList<Player> &playerList) {
         if (status == "success") {
