@@ -133,6 +133,7 @@ void ChessBox::mousePressEvent(QGraphicsSceneMouseEvent *event)
                         game->check->setPlainText("END GAME");
                         game->gameOver();
 
+
                     }
                     return;
 

@@ -109,6 +109,11 @@ void ClientManager::onReadyRead()
             // qDebug() << "Register " << status << ": " << message;
             emit moveCoordinate(old_row, old_col, new_row, new_col);
         }
+        if (jsonObj.contains("type") && jsonObj["type"].toString() == "winner") {
+            game->check->setPlainText("LOSER");
+            game->gameOver();
+        }
+
         if (jsonObj.contains("type") && jsonObj["type"].toString() == "login_ack") {
             QString status = jsonObj["status"].toString();
             QString message = jsonObj["message"].toString();
