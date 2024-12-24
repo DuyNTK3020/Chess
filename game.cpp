@@ -570,16 +570,6 @@ void Game::displayMenu(const QString &logTextResult) {
         displayProfile();
     });
 
-    connect(clientManager, &ClientManager::createRoomResult, this, [=](const QString &status, const QString &message) {
-        if (status == "success") {
-            Player emptyPlayer;
-            displayRoom(emptyPlayer);
-        } else if (status == "failure") {
-            logText->setPlainText(message);
-            logText->setPos(width()/2 - logText->boundingRect().width()/2, btnYPos + 300);
-        }
-    });
-
     connect(clientManager, &ClientManager::invitePlayerResult, this, [=](const QString &username, const QString &name) {
         QGraphicsTextItem *inviteText1 = new QGraphicsTextItem("Invitation from");
         inviteText1->setFont(inviteFont);
@@ -638,6 +628,7 @@ void Game::displayMenu(const QString &logTextResult) {
         if (status == "success") {
             Player emptyPlayer;
             room = room_id;
+            disconnect(clientManager, &ClientManager::createRoomResult, this, nullptr);
             displayRoom(emptyPlayer);
         } else if (status == "failure") {
             logText->setPlainText(message);
@@ -647,6 +638,7 @@ void Game::displayMenu(const QString &logTextResult) {
 
     connect(clientManager, &ClientManager::respondInviteResult, this, [=](const QString &status, const QString &message, Player &player) {
         if (status == "success") {
+            disconnect(clientManager, &ClientManager::respondInviteResult, this, nullptr);
             displayRoom(player);
         } else if (status == "failure") {
             logText->setPlainText(message);
@@ -700,8 +692,10 @@ void Game::displayWaitFindMatch() {
     connect(clientManager, &ClientManager::findMatchResult, this, [=](const QString &status, const QString &message, const QString &opponent, const QString &match_id, const QString &role) {
         timer->stop();
         if (status == "success") {
+            disconnect(clientManager, &ClientManager::findMatchResult, this, nullptr);
             start(status,match_id,opponent,role);
         } else if (status == "failure") {
+            disconnect(clientManager, &ClientManager::findMatchResult, this, nullptr);
             displayMenu(message);
         }
     });
@@ -840,15 +834,15 @@ void Game::displayRoom(Player &player) {
         displayMenu("");
     });
 
-    // Button *testButton = new Button("Test");
-    // testButton->setPos(0, 200);
-    // addToScene(testButton);
-    // listG.append(testButton);
-    // connect(testButton, &Button::clicked, this, [=]() mutable {
-    //     if (clientManager) {
-    //         clientManager->sendGetListPlayerRequest(user->getUsername());
-    //     }
-    // });
+    Button *testButton = new Button("Reload");
+    testButton->setPos(800, 248);
+    addToScene(testButton);
+    listG.append(testButton);
+    connect(testButton, &Button::clicked, this, [=]() mutable {
+        if (clientManager) {
+            clientManager->sendGetListPlayerRequest(user->getUsername());
+        }
+    });
 
     connect(clientManager, &ClientManager::invitationResult, this, [=](const QString &status, const QString &message, Player &player) {
         if (status == "success") {
@@ -896,6 +890,15 @@ void Game::displayRoom(Player &player) {
 
     connect(clientManager, &ClientManager::startGameResult, this, [=](const QString &status, const QString &message, const QString &opponent, const QString &match_id, const QString &role) {
         if (status == "success") {
+            disconnect(clientManager, &ClientManager::invitationResult, this, nullptr);
+            disconnect(clientManager, &ClientManager::getListPlayerResult, this, nullptr);
+            qDeleteAll(players);
+            players.clear();
+            for (QGraphicsItem *item : listPlayerItems) {
+                removeFromScene(item);
+                delete item;
+            }
+            listPlayerItems.clear();
             start(status,match_id,opponent,role);
         } else if (status == "failure") {
             displayMenu(message);

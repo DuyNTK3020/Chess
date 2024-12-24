@@ -371,7 +371,7 @@ void ClientManager::sendOutRoomRequest(const QString &username, const QString &o
 
 void ClientManager::sendStartGameRequest(const QString &username1, const QString &username2) {
     QJsonObject json;
-    json["type"] = "out_room";
+    json["type"] = "start_game";
     json["username1"] = username1;
     json["username2"] = username2;
 
