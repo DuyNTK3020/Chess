@@ -20,6 +20,8 @@ public:
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
     void setColor(QColor color);
     void placePiece(ChessPiece *piece);
+    void placePiece2(ChessPiece *piece);
+
 
 
     void resetOriginalColor();
@@ -29,6 +31,8 @@ public:
     void setHasChessPiece(bool value,ChessPiece *piece = 0);
 
     void checkForCheck();
+    void checkForCheck2();
+
 
     QString getChessPieceColor() ;
     void setChessPieceColor(QString value);
@@ -36,6 +40,8 @@ public:
 
     int rowLoc;
     int colLoc;
+
+    static int count;
 
     QString getPosition();
 
