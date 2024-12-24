@@ -301,7 +301,9 @@ void Game::displayLogin() {
                 user->setPassword(password);
                 user->setName(name);
                 user->setToken(token);
+                qDebug()<<elo;
                 user->setElo(elo);
+                qDebug()<<user->getElo();
                 displayWaitConnect();
 
             } else if (status == "failed") {
@@ -631,9 +633,10 @@ void Game::displayMenu(const QString &logTextResult) {
         });
     });
 
-    connect(clientManager, &ClientManager::createRoomResult, this, [=](const QString &status, const QString &message) {
+    connect(clientManager, &ClientManager::createRoomResult, this, [=](const QString &status, const QString &message, const QString &room_id) {
         if (status == "success") {
             Player emptyPlayer;
+            room = room_id;
             displayRoom(emptyPlayer);
         } else if (status == "failure") {
             logText->setPlainText(message);
@@ -832,13 +835,20 @@ void Game::displayRoom(Player &player) {
             delete item;
         }
         listPlayerItems.clear();
+        room = "";
+        clientManager->sendOutRoomRequest(user->getUsername(), "", room);
         displayMenu("");
     });
 
-    // if (clientManager) {
-    //     clientManager->sendGetListPlayerRequest(user->getUsername());
-    // }
-
+    Button *testButton = new Button("Test");
+    testButton->setPos(0, 200);
+    addToScene(testButton);
+    listG.append(testButton);
+    connect(testButton, &Button::clicked, this, [=]() mutable {
+        if (clientManager) {
+            clientManager->sendGetListPlayerRequest(user->getUsername());
+        }
+    });
 
     connect(clientManager, &ClientManager::getListPlayerResult, this, [=](const QString &status, const QString &message, const QList<Player> &playerList) {
         if (status == "success") {

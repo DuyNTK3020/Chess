@@ -71,7 +71,7 @@ void ClientManager::onReadyRead()
             QString status = jsonObj["status"].toString();
             QString message = jsonObj["message"].toString();
             QString name = jsonObj["name"].toString();
-            int elo = jsonObj["elo"].toString().toInt();
+            int elo = jsonObj["elo"].toInt();
             QString token = jsonObj["token"].toString();
             // qDebug() << "Login " << status << ": " << name << " " << elo;
             emit loginResult(status, message, name, elo, token);  // Đăng nhập thành công
@@ -97,7 +97,8 @@ void ClientManager::onReadyRead()
         if (jsonObj.contains("type") && jsonObj["type"].toString() == "create_room_ack") {
             QString status = jsonObj["status"].toString();
             QString message = jsonObj["message"].toString();
-            emit createRoomResult(status, message);
+            QString room_id = jsonObj["room_id"].toString();
+            emit createRoomResult(status, message, room_id);
         }
         if (jsonObj.contains("type") && jsonObj["type"].toString() == "update_profile_ack") {
             QString status = jsonObj["status"].toString();
@@ -327,11 +328,12 @@ void ClientManager::sendRespondInviteRequest(const QString &status, const QStrin
     }
 }
 
-void ClientManager::sendOutRoomRequest(const QString &status, const QString &username) {
+void ClientManager::sendOutRoomRequest(const QString &username, const QString &opponent, const QString &room_id) {
     QJsonObject json;
     json["type"] = "out_room";
-    json["status"] = status;
     json["username"] = username;
+    json["opponent"] = opponent;
+    json["room_id"] = room_id;
 
     QJsonDocument doc(json);
     QByteArray data = doc.toJson(QJsonDocument::Compact);

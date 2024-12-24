@@ -23,6 +23,7 @@ public:
     void sendGetListPlayerRequest(const QString &username);
     void sendInvitePlayerRequest(const QString &username, const QString &name, const QString &invitePlayer);
     void sendRespondInviteRequest(const QString &status, const QString &username, const QString &invite_player);
+    void sendOutRoomRequest(const QString &status, const QString &username, const QString &room_id);
 
 signals:
     void moveReceived(const QString &moveData);
@@ -30,13 +31,12 @@ signals:
     void loginResult(const QString &status, const QString &message, const QString &name, int elo, const QString &token);
     void connectionResult(const QString &status, const QString &message);
     void findMatchResult(const QString &status, const QString &message, const QString &opponent, const QString &match_id, const QString &role);
-    void createRoomResult(const QString &status, const QString &message);
+    void createRoomResult(const QString &status, const QString &message, const QString &room_id);
     void updateProfileResult(const QString &status, const QString &message);
     void changePasswordResult(const QString &status, const QString &message);
     void getListPlayerResult(const QString &status, const QString &message, const QList<Player> &players);
     void invitePlayerResult(const QString &username, const QString &name);
     void respondInviteResult(const QString &status, const QString &message, Player &player);
-    void sendOutRoomRequest(const QString &status, const QString &username);
 
 private slots:
     void onReadyRead();

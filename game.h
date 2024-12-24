@@ -71,7 +71,7 @@ private:
     ChessBoard *chess;
     QList <QGraphicsItem *> listG;
     QGraphicsTextItem * turnDisplay;
-
+    QString room;
 
 };
 
