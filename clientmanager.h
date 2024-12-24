@@ -13,6 +13,7 @@ public:
     explicit ClientManager(QObject *parent = nullptr);
     void connectToServer(const QString &host, int port);
     void sendMove(const QString &game_id, const QString &username,int oldRow, int oldCol, int newRow, int newCol);
+    void sendLoser(const QString &game_id, const QString &username);
     void sendRegisterRequest(const QString &name, const QString &username, const QString &password);
     void sendLoginRequest(const QString &username, const QString &password);
     void sendConnectRequest(const QString &token, const QString &username);
@@ -40,6 +41,7 @@ signals:
     void respondInviteResult(const QString &status, const QString &message, Player &player);
     void invitationResult(const QString &status, const QString &message, Player &player);
     void startGameResult(const QString &status, const QString &message, const QString &opponent, const QString &match_id, const QString &role);
+    void moveCoordinate(int old_row,int old_col,int new_row,int new_col);
 
 private slots:
     void onReadyRead();

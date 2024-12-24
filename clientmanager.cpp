@@ -6,6 +6,11 @@
 #include <QDebug>
 #include <QJsonArray>
 #include <QJsonObject>
+#include <chessbox.h>
+#include "game.h"
+
+extern Game *game;
+
 
 ClientManager::ClientManager(QObject *parent) : QObject(parent), socket(new QTcpSocket(this))
 {
@@ -50,6 +55,29 @@ void ClientManager::sendMove(const QString &game_id, const QString &username,
     }
 }
 
+void ClientManager::sendLoser(const QString &game_id, const QString &username)
+{
+    // Tạo đối tượng JSON để gửi
+    QJsonObject json;
+    json["type"] = "loser";  // Loại yêu cầu
+    json["match_id"] = game_id;  // Tên tài khoản người dùng
+    json["username"] = username;  // Tên tài khoản người dùng
+
+    // Chuyển đổi đối tượng JSON thành chuỗi byte (UTF-8)
+    QJsonDocument doc(json);
+    QByteArray data = doc.toJson(QJsonDocument::Compact);  // Sử dụng định dạng gọn gàng
+
+    // Kiểm tra xem socket có thể ghi dữ liệu không
+    if (socket && socket->isWritable()) {
+        // Gửi dữ liệu qua socket
+        socket->write(data);
+        socket->flush();  // Đảm bảo dữ liệu được gửi ngay lập tức
+        qDebug() << "Sent move request:" << data;
+    } else {
+        qDebug() << "Socket not writable!";
+    }
+}
+
 
 void ClientManager::onReadyRead()
 {
@@ -66,6 +94,20 @@ void ClientManager::onReadyRead()
             QString message = jsonObj["message"].toString();
             // qDebug() << "Register " << status << ": " << message;
             emit registerResult(status, message);
+        }
+        if (jsonObj.contains("type") && jsonObj["type"].toString() == "move") {
+            int old_row = jsonObj["old_row"].toInt();
+            int old_col = jsonObj["old_col"].toInt();
+            int new_row = jsonObj["new_row"].toInt();
+            int new_col = jsonObj["new_col"].toInt();
+            qDebug() << old_row << " " << old_col << " " << new_row << " " <<new_col;
+
+            ChessBox *oldBox = game->collection[old_row][old_col];
+            ChessBox *newBox = game->collection[new_row][new_col];
+
+            oldBox->updateOpponentMove(oldBox,newBox);
+            // qDebug() << "Register " << status << ": " << message;
+            emit moveCoordinate(old_row, old_col, new_row, new_col);
         }
         if (jsonObj.contains("type") && jsonObj["type"].toString() == "login_ack") {
             QString status = jsonObj["status"].toString();
