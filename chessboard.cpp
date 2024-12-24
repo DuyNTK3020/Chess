@@ -133,10 +133,11 @@ void ChessBoard::setUpWhite2()
     white.append(piece);
     piece = new Bishop("WHITE");
     white.append(piece);
-    piece = new Queen("WHITE");
-    white.append(piece);
     piece = new King("WHITE");
     white.append(piece);
+    piece = new Queen("WHITE");
+    white.append(piece);
+
     piece = new Bishop("WHITE");
     white.append(piece);
     piece = new Knight("WHITE");
@@ -188,10 +189,11 @@ void ChessBoard::setUpBlack2()
     black.append(piece);
     piece = new Bishop("BLACK");
     black.append(piece);
-    piece = new Queen("BLACK");
-    black.append(piece);
     piece = new King("BLACK");
     black.append(piece);
+    piece = new Queen("BLACK");
+    black.append(piece);
+
     piece = new Bishop("BLACK");
     black.append(piece);
     piece = new Knight("BLACK");

@@ -11,8 +11,6 @@
 
 extern Game *game;
 
-ChessBox *oldBox;
-
 
 ClientManager::ClientManager(QObject *parent) : QObject(parent), socket(new QTcpSocket(this))
 {
@@ -81,8 +79,10 @@ void ClientManager::onReadyRead()
             int new_col = jsonObj["new_col"].toInt();
             qDebug() << old_row << " " << old_col << " " << new_row << " " <<new_col;
 
-            oldBox->updateOpponentMove(old_col, old_row, new_col,new_row);
+            ChessBox *oldBox = game->collection[old_row][old_col];
+            ChessBox *newBox = game->collection[new_row][new_col];
 
+            oldBox->updateOpponentMove(oldBox,newBox);
             // qDebug() << "Register " << status << ": " << message;
             emit moveCoordinate(old_row, old_col, new_row, new_col);
         }

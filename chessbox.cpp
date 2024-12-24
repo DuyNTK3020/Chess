@@ -87,11 +87,11 @@ void ChessBox::mousePressEvent(QGraphicsSceneMouseEvent *event)
             game->changeTurn();
             checkForCheck();
 
-            // ChessBox *oldBox = game->collection[1][1];
-            // ChessBox *newBox = game->collection[2][1];
+             //ChessBox *oldBox = game->collection[1][1];
+             //ChessBox *newBox = game->collection[5][1];
 
             // oldBox->updateOpponentMove(oldBox,newBox);
-            //updateOpponentMove(1,1,2,1);
+            //updateOpponentMove(oldBox,newBox);
 
         }
         //Selecting couterpart of the chessPiece
@@ -101,11 +101,17 @@ void ChessBox::mousePressEvent(QGraphicsSceneMouseEvent *event)
         }
 }
 
-void ChessBox::updateOpponentMove(int old_col,int old_row, int new_col,int new_row){
+void ChessBox::updateOpponentMove(ChessBox *oldBox, ChessBox *newBox){
+    if(newBox->getHasChessPiece()){
+        newBox->currentPiece->setIsPlaced(false);
+        newBox->currentPiece->setCurrentBox(NULL);
+        game->placeInDeadPlace(newBox->currentPiece);
+
+    }
     //qDebug() << "Test xem như nào:" << game->collection[1][1]->currentPiece->getSide();
 
-    ChessBox *oldBox = game->collection[old_row][old_col];
-    ChessBox *newBox = game->collection[new_row][new_col];
+    //ChessBox *oldBox = game->collection[old_row][old_col];
+    //ChessBox *newBox = game->collection[new_row][new_col];
 
     //qDebug() << "OldBox Address:" << oldBox;
     //qDebug() << "NewBox Address:" << newBox;
@@ -149,12 +155,7 @@ void ChessBox::updateOpponentMove(int old_col,int old_row, int new_col,int new_r
     //qDebug() << "Updating piece's currentBox...";
     //piece->setCurrentBox(newBox);
     //qDebug() << "Piece's currentBox after update:" << piece->getCurrentBox()->getPosition();
-    if(newBox->getHasChessPiece()){
-        newBox->currentPiece->setIsPlaced(false);
-        newBox->currentPiece->setCurrentBox(NULL);
-        game->placeInDeadPlace(this->currentPiece);
 
-    }
 
 
 

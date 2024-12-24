@@ -32,7 +32,7 @@ public:
 
     QString getChessPieceColor() ;
     void setChessPieceColor(QString value);
-    void updateOpponentMove(int old_col,int old_row, int new_col,int new_row);
+    void updateOpponentMove(ChessBox *oldBox, ChessBox *newBox);
 
     int rowLoc;
     int colLoc;
