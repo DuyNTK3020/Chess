@@ -748,8 +748,6 @@ void Game::displayRoom(Player &player) {
 
     QFontMetrics metrics(QFont("Arial", 16));
 
-    // QGraphicsTextItem *nameItem = new QGraphicsTextItem(metrics.elidedText(player->getName(), Qt::ElideRight, 200), background);
-
     QGraphicsTextItem *player1Name = new QGraphicsTextItem("");
     player1Name->setFont(playerFont);
     player1Name->setDefaultTextColor(Qt::red);
@@ -823,9 +821,6 @@ void Game::displayRoom(Player &player) {
     Button *startButton = new Button("Start");
     startButton->setPos(400, 600);
     startButton->setEnabled(false);
-    connect(startButton, &Button::clicked, this, []() {
-        qDebug() << "Game started!";
-    });
     addToScene(startButton);
     listG.append(startButton);
 
@@ -865,6 +860,9 @@ void Game::displayRoom(Player &player) {
             waitingText->setPlainText("");
             waitingText->setPos(500 - waitingText->boundingRect().width()/2, 475);
             startButton->setEnabled(true);
+            connect(startButton, &Button::clicked, this, [=]() {
+                clientManager->sendStartGameRequest(user->getUsername(), player.getUsername());
+            });
         } else {
             waitingText->setPlainText(message);
             waitingText->setPos(500 - waitingText->boundingRect().width()/2, 475);
@@ -893,6 +891,14 @@ void Game::displayRoom(Player &player) {
             createPlayerListView(players);
         } else if (status == "failure") {
             qDebug() << message;
+        }
+    });
+
+    connect(clientManager, &ClientManager::startGameResult, this, [=](const QString &status, const QString &message, const QString &opponent, const QString &match_id, const QString &role) {
+        if (status == "success") {
+            start(status,match_id,opponent,role);
+        } else if (status == "failure") {
+            displayMenu(message);
         }
     });
 

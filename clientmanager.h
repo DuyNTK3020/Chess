@@ -38,7 +38,8 @@ signals:
     void invitePlayerResult(const QString &username, const QString &name);
     void respondInviteResult(const QString &status, const QString &message, Player &player);
     void invitationResult(const QString &status, const QString &message, Player &player);
-
+    void sendStartGameRequest(const QString &username1, const QString &username2);
+    void startGameResult(const QString &status, const QString &message, const QString &opponent, const QString &match_id, const QString &role);
 
 private slots:
     void onReadyRead();

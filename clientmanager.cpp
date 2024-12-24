@@ -146,6 +146,18 @@ void ClientManager::onReadyRead()
             }
             emit invitationResult(status, message, user);
         }
+        if (jsonObj.contains("type") && jsonObj["type"].toString() == "start_game_ack") {
+            QString status = jsonObj["status"].toString();
+            QString message = jsonObj["message"].toString();
+            QString opponent = jsonObj["opponent"].toString();
+            QString match_id = jsonObj["match_id"].toString();
+            QString role = jsonObj["role"].toString();
+            if (status == "success") {
+                emit startGameResult(status, message, opponent, match_id, role);
+            } else {
+                emit startGameResult(status, message, "", "", "");
+            }
+        }
     }
 }
 
@@ -344,6 +356,24 @@ void ClientManager::sendOutRoomRequest(const QString &username, const QString &o
     json["username"] = username;
     json["opponent"] = opponent;
     json["room_id"] = room_id;
+
+    QJsonDocument doc(json);
+    QByteArray data = doc.toJson(QJsonDocument::Compact);
+
+    if (socket && socket->isWritable()) {
+        socket->write(data);
+        socket->flush();
+        qDebug() << "Sent connect request:" << data;
+    } else {
+        qDebug() << "Socket not writable!";
+    }
+}
+
+void ClientManager::sendStartGameRequest(const QString &username1, const QString &username2) {
+    QJsonObject json;
+    json["type"] = "out_room";
+    json["username1"] = username1;
+    json["username2"] = username2;
 
     QJsonDocument doc(json);
     QByteArray data = doc.toJson(QJsonDocument::Compact);
