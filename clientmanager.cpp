@@ -200,6 +200,11 @@ void ClientManager::onReadyRead()
                 emit startGameResult(status, message, "", "", "");
             }
         }
+
+        if (jsonObj.contains("type") && jsonObj["type"].toString() == "winner") {
+            game->check->setPlainText("Winner");
+            game->gameOver();
+        }
     }
 }
 
