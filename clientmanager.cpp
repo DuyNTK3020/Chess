@@ -428,3 +428,21 @@ void ClientManager::sendStartGameRequest(const QString &username1, const QString
         qDebug() << "Socket not writable!";
     }
 }
+
+void ClientManager::sendPlayAgainRequest(const QString &username, const QString &match_id) {
+    QJsonObject json;
+    json["type"] = "play_again";
+    json["username"] = username;
+    json["match_id"] = match_id;
+
+    QJsonDocument doc(json);
+    QByteArray data = doc.toJson(QJsonDocument::Compact);
+
+    if (socket && socket->isWritable()) {
+        socket->write(data);
+        socket->flush();
+        qDebug() << "Sent connect request:" << data;
+    } else {
+        qDebug() << "Socket not writable!";
+    }
+}

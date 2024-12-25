@@ -45,6 +45,7 @@ public:
     void displayWaitFindMatch();
     void displayRoom(Player &player);
     void displayProfile();
+    void displayResult(const QString &result, const QString &match_id);
 
     void clearInvitation(QGraphicsTextItem *inviteText, Button *acceptButton, Button *declineButton);
     void createPlayerListView(const QList<Player *> &playerList);

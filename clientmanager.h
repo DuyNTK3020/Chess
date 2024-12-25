@@ -26,6 +26,7 @@ public:
     void sendRespondInviteRequest(const QString &status, const QString &username, const QString &invite_player);
     void sendOutRoomRequest(const QString &status, const QString &username, const QString &room_id);
     void sendStartGameRequest(const QString &username1, const QString &username2);
+    void sendPlayAgainRequest(const QString &username, const QString &match_id);
 
 signals:
     void moveReceived(const QString &moveData);

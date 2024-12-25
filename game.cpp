@@ -994,9 +994,9 @@ void Game::displayProfile()
     QString oldName = user->getName();
     QString oldPassword = user->getPassword();
 
-    // Xóa các mục hiện tại
-    clearScene();
+    setBackground();
 
+    clearScene();
     // Tiêu đề
     QGraphicsTextItem *profileTitle = new QGraphicsTextItem("Profile");
     QFont profileFont("arial", 40);
@@ -1009,24 +1009,28 @@ void Game::displayProfile()
 
     QGraphicsTextItem *nameTitle = new QGraphicsTextItem("Name");
     // nameTitle->setFont(titleFont);
+    nameTitle->setDefaultTextColor(Qt::white);
     nameTitle->setPos(500, 200);
     addToScene(nameTitle);
     listG.append(nameTitle);
 
     QGraphicsTextItem *eloTitle = new QGraphicsTextItem("Elo");
     // eloTitle->setFont(titleFont);
+    eloTitle->setDefaultTextColor(Qt::white);
     eloTitle->setPos(500, 300);
     addToScene(eloTitle);
     listG.append(eloTitle);
 
     QGraphicsTextItem *passwordTitle = new QGraphicsTextItem("Password");
     // passwordTitle->setFont(titleFont);
+    passwordTitle->setDefaultTextColor(Qt::white);
     passwordTitle->setPos(500, 400);
     addToScene(passwordTitle);
     listG.append(passwordTitle);
 
     QGraphicsTextItem *newPasswordTitle = new QGraphicsTextItem("New password");
     // newPasswordTitle->setFont(titleFont);
+    newPasswordTitle->setDefaultTextColor(Qt::white);
     newPasswordTitle->setPos(500, 500);
     newPasswordTitle->hide();
     addToScene(newPasswordTitle);
@@ -1158,6 +1162,32 @@ void Game::displayProfile()
     listG.append(outButton);
     connect(outButton, &Button::clicked, this, [=]() mutable {
         displayMenu("");
+    });
+}
+
+void Game::displayResult(const QString &result, const QString &match_id) {
+    setBackground();
+
+    clearScene();
+
+    QString titleResult = QString("You are %1").arg(result);
+    QGraphicsTextItem *profileTitle = new QGraphicsTextItem(titleResult);
+    QFont profileFont("arial", 50);
+    profileTitle->setFont(profileFont);
+    profileTitle->setPos(width()/2 - profileTitle->boundingRect().width()/2, 100);
+    addToScene(profileTitle);
+    listG.append(profileTitle);
+
+    // Nút tìm trận
+    Button *playAgainButton = new Button("Play Again.");
+    playAgainButton->setPos(width()/2 - playAgainButton->boundingRect().width()/2, 300);
+    addToScene(playAgainButton);
+    listG.append(playAgainButton);
+
+    connect(playAgainButton, &Button::clicked, this, [=]() mutable {
+        if (clientManager) {
+            clientManager->sendPlayAgainRequest(user->getUsername(), match_id);
+        }
     });
 }
 
