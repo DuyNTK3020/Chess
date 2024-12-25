@@ -202,8 +202,23 @@ void ClientManager::onReadyRead()
         }
 
         if (jsonObj.contains("type") && jsonObj["type"].toString() == "winner") {
-            game->check->setPlainText("Winner");
-            game->gameOver();
+            emit winnerResult("winner");
+            // game->check->setPlainText("Winner");
+            // game->gameOver();
+            // game->displayMenu("");
+        }
+
+        if (jsonObj.contains("type") && jsonObj["type"].toString() == "after_game_ack") {
+            QString status = jsonObj["status"].toString();
+            QString message = jsonObj["message"].toString();
+            QString opponent = jsonObj["opponent"].toString();
+            QString match_id = jsonObj["match_id"].toString();
+            QString role = jsonObj["role"].toString();
+            if (status == "success") {
+                emit startGameResult(status, message, opponent, match_id, role);
+            } else {
+                emit startGameResult(status, message, "", "", "");
+            }
         }
     }
 }
@@ -434,9 +449,10 @@ void ClientManager::sendStartGameRequest(const QString &username1, const QString
     }
 }
 
-void ClientManager::sendPlayAgainRequest(const QString &username, const QString &match_id) {
+void ClientManager::sendAfterGameRequest(const QString &status, const QString &username, const QString &match_id) {
     QJsonObject json;
-    json["type"] = "play_again";
+    json["type"] = "after_game";
+    json["status"] = status;
     json["username"] = username;
     json["match_id"] = match_id;
 

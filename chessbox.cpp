@@ -130,9 +130,9 @@ void ChessBox::mousePressEvent(QGraphicsSceneMouseEvent *event)
                         if (clientManager) {
                             clientManager->sendLoser(game->match_id,user->getUsername());
                         }
-                        game->check->setPlainText("END GAME");
+                        game->check->setPlainText("");
                         game->gameOver();
-
+                        game->displayMenu("You Lose");
                     }
                     return;
 

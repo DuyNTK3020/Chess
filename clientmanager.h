@@ -26,7 +26,7 @@ public:
     void sendRespondInviteRequest(const QString &status, const QString &username, const QString &invite_player);
     void sendOutRoomRequest(const QString &status, const QString &username, const QString &room_id);
     void sendStartGameRequest(const QString &username1, const QString &username2);
-    void sendPlayAgainRequest(const QString &username, const QString &match_id);
+    void sendAfterGameRequest(const QString &status, const QString &username, const QString &match_id);
 
 signals:
     void moveReceived(const QString &moveData);
@@ -43,6 +43,7 @@ signals:
     void invitationResult(const QString &status, const QString &message, Player &player);
     void startGameResult(const QString &status, const QString &message, const QString &opponent, const QString &match_id, const QString &role);
     void moveCoordinate(int old_row,int old_col,int new_row,int new_col);
+    void winnerResult(const QString &winner);
 
 private slots:
     void onReadyRead();

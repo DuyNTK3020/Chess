@@ -173,6 +173,7 @@ void Game::changeTurn()
     turnDisplay->setPlainText("Turn : " + getTurn()); // Cập nhật hiển thị lượt
 }
 
+extern ClientManager *clientManager;
 void Game::start(const QString &status, const QString &match_id, const QString &opponent, const QString &role)
 {
     if (background) {
@@ -206,6 +207,14 @@ void Game::start(const QString &status, const QString &match_id, const QString &
     addToScene(blackPiece);
     addToScene(check); // Thêm thông báo "CHECK"
     chess->addChessPiece(role); // Thêm các quân cờ vào bàn cờ
+    connect(clientManager, &ClientManager::winnerResult, this, [=](const QString &status) {
+        if (status == "winner") {
+            disconnect(clientManager, &ClientManager::winnerResult, this, nullptr);
+            check->setPlainText("");
+            gameOver();
+            displayMenu("You Win");
+        }
+    });
 
 }
 
@@ -892,6 +901,7 @@ void Game::displayRoom(Player &player) {
         if (status == "success") {
             disconnect(clientManager, &ClientManager::invitationResult, this, nullptr);
             disconnect(clientManager, &ClientManager::getListPlayerResult, this, nullptr);
+            disconnect(clientManager, &ClientManager::startGameResult, this, nullptr);
             qDeleteAll(players);
             players.clear();
             for (QGraphicsItem *item : listPlayerItems) {
@@ -1179,21 +1189,32 @@ void Game::displayResult(const QString &result, const QString &match_id) {
     listG.append(profileTitle);
 
     // Nút tìm trận
-    Button *playAgainButton = new Button("Play Again.");
+    Button *playAgainButton = new Button("Play Again");
     playAgainButton->setPos(width()/2 - playAgainButton->boundingRect().width()/2, 300);
     addToScene(playAgainButton);
     listG.append(playAgainButton);
 
+    Button *newGameButton = new Button("New Game");
+    newGameButton->setPos(width()/2 - newGameButton->boundingRect().width()/2, 400);
+    addToScene(newGameButton);
+    listG.append(newGameButton);
+
     connect(playAgainButton, &Button::clicked, this, [=]() mutable {
         if (clientManager) {
-            clientManager->sendPlayAgainRequest(user->getUsername(), match_id);
+            clientManager->sendAfterGameRequest("play_again",user->getUsername(), match_id);
+        }
+    });
+
+    connect(newGameButton, &Button::clicked, this, [=]() mutable {
+        if (clientManager) {
+            clientManager->sendAfterGameRequest("new_game",user->getUsername(), match_id);
         }
     });
 }
 
 void Game::gameOver()
 {
-    // removeAll();
+    removeAll();
     setTurn("WHITE");
     alivePiece.clear();
     chess->reset();
